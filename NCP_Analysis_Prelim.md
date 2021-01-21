@@ -1167,3 +1167,146 @@ summary(lm(data = data, score ~ BAI.sum*Group))
     ##   (18 observations deleted due to missingness)
     ## Multiple R-squared:  0.228,  Adjusted R-squared:  0.1753 
     ## F-statistic: 4.331 on 3 and 44 DF,  p-value: 0.009264
+
+### High- vs. Low- Performers
+
+Two clusters, especially among the high-NCP group, in Efficiency and
+Score. Compare two groups (low = below mean, high = above mean) by
+Anxiety scores.
+
+``` r
+# 1. Accuracy
+accuracy <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$freq)
+accuracy$performance <- ifelse(accuracy$data.Group == "high" & accuracy$data.freq > h.acc$mean, "Above", 
+                             ifelse(accuracy$data.Group == "low" & accuracy$data.freq > l.acc$mean, "Above",
+                                    ifelse(accuracy$data.Group == "high" & accuracy$data.freq < h.acc$mean, "Below", "Below")))
+
+# Above and Below Average Performers among High-NCP Group
+acc_high <- accuracy %>% filter(data.Group == "high") %>% drop_na()
+ggplot(acc_high, aes(x = data.BAI.sum, y = data.freq, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Accuracy Correlation of Above vs. Below Average Performers among High-NCP Group", 
+       x = "BAI score", y = "Accuracy") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-1.png)<!-- -->
+
+``` r
+# Above and Below Average Performers among Low-NCP Group
+acc_low <- accuracy %>% filter(data.Group == "low") %>% drop_na()
+ggplot(acc_low, aes(x = data.BAI.sum, y = data.freq, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Accuracy Correlation of Above vs. Below Average Performers among Low-NCP Group", 
+       x = "BAI score", y = "Accuracy") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-2.png)<!-- -->
+
+``` r
+# 2. Efficiency
+efficiency <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$PCET_EFF)
+efficiency$performance <- ifelse(efficiency$data.Group == "high" & efficiency$data.PCET_EFF > h.eff$mean, "Above", 
+                             ifelse(efficiency$data.Group == "low" & efficiency$data.PCET_EFF > l.eff$mean, "Above",
+                                    ifelse(efficiency$data.Group == "high" & efficiency$data.PCET_EFF < h.eff$mean, "Below", "Below")))
+
+# Above and Below Average Performers among High-NCP Group
+eff_high <- efficiency %>% filter(data.Group == "high") %>% drop_na()
+ggplot(eff_high, aes(x = data.BAI.sum, y = data.PCET_EFF, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Efficiency Correlation of Above vs. Below Average Performers among High-NCP Group", 
+       x = "BAI score", y = "Efficiency") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-3.png)<!-- -->
+
+``` r
+# Above and Below Average Performers among Low-NCP Group
+eff_low <- efficiency %>% filter(data.Group == "low") %>% drop_na()
+ggplot(eff_low, aes(x = data.BAI.sum, y = data.PCET_EFF, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Efficiency Correlation of Above vs. Below Average Performers among Low-NCP Group", 
+       x = "BAI score", y = "Efficiency") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-4.png)<!-- -->
+
+``` r
+# 3. Score
+score <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$score)
+score$performance <- ifelse(score$data.Group == "high" & score$data.score > h.sc$mean, "Above", 
+                             ifelse(score$data.Group == "low" & score$data.score > l.sc$mean, "Above",
+                                    ifelse(score$data.Group == "high" & score$data.score < h.sc$mean, "Below", "Below")))
+
+# Above and Below Average Performers among High-NCP Group
+sc_high <- score %>% filter(data.Group == "high") %>% drop_na()
+ggplot(sc_high, aes(x = data.BAI.sum, y = data.score, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Score Correlation of Above vs. Below Average Performers among High-NCP Group", 
+       x = "BAI score", y = "Score") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-5.png)<!-- -->
+
+``` r
+# Above and Below Average Performers among Low-NCP Group
+sc_low <- score %>% filter(data.Group == "low") %>% drop_na()
+ggplot(sc_low, aes(x = data.BAI.sum, y = data.score, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Score Correlation of Above vs. Below Average Performers among Low-NCP Group", 
+       x = "BAI score", y = "Score") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-6.png)<!-- -->
+
+``` r
+# 4. RT -- below average is faster
+# 4.1 Correct Responses RT 
+RT <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$PCETRTER)
+RT$performance <- ifelse(RT$data.Group == "high" & RT$data.PCETRTER > mean(incorr.high.rt$value, na.rm = T), "Above", 
+                    ifelse(RT$data.Group == "low" & RT$data.PCETRTER > mean(incorr.low.rt$value, na.rm = T), "Above",
+                      ifelse(RT$data.Group == "high" & RT$data.PCETRTER < mean(incorr.high.rt$value, na.rm = T), "Below", "Below")))
+
+# Above and Below Average Performers among High-NCP Group
+RT_high <- RT %>% filter(data.Group == "high") %>% drop_na()
+ggplot(RT_high, aes(x = data.BAI.sum, y = data.PCETRTER, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Incorrect RT Correlation of Above vs. Below Average Performers among High-NCP Group", 
+       x = "BAI score", y = "Incorrect RT") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-7.png)<!-- -->
+
+``` r
+# Above and Below Average Performers among Low-NCP Group
+RT_low <- RT %>% filter(data.Group == "low") %>% drop_na()
+ggplot(RT_low, aes(x = data.BAI.sum, y = data.PCETRTER, col = performance), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "BAI-Incorrect RT Correlation of Above vs. Below Average Performers among Low-NCP Group", 
+       x = "BAI score", y = "Incorrect RT") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/learn-8.png)<!-- -->

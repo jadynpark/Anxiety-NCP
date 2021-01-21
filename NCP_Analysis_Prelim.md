@@ -33,45 +33,34 @@ NCP but not low NCP
 ``` r
 #load libraries 
 rm(list = ls())
-library(knitr); library(kableExtra); library(reshape2); library(tidyverse); library(dplyr); library(effsize); library(tables); library(ggplot2); library(ggpubr); library(RColorBrewer); library(ez); source("~/Desktop/Anxiety NCP/summarySEwithin2.R")
+library(knitr); library(kableExtra); library(reshape2); library(tidyverse); library(dplyr); library(effsize); library(tables); library(ggplot2); library(ggpubr); library(RColorBrewer); library(ez); source("~/Desktop/Anxiety NCP/summarySEwithin2.R"); library(wesanderson)
 
 #import data - demographics, self report, and PCET
-master.path <- "~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv"
-master.data <- read.csv(master.path, header = TRUE)
-
-#import WPT data
-wpt.path <- "~/Desktop/Anxiety NCP/Weather Prediction Data/WPT_master.csv"
+data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
 ```
 
 ### Demographics
 
 ``` r
-#demographics
-master.data$Group <- "NCP"
-master.data$Group[master.data$Subject.ID < 5000] <- "HC"
-master.data$Group <- as.factor(master.data$Group)
-
-demo.data <- master.data %>% dplyr::group_by(Group) %>%
-  dplyr::summarise(N = sum(!is.na(Subject.ID)),
+# Demographics
+demo.data <- data %>% dplyr::summarise(N = sum(!is.na(Subject.ID)),
             meanAge = mean(Age, na.rm = TRUE),
-            female = sum(Sex == "Female"),
-            male = sum(Sex == "Male"),
+            female = sum(Sex == "F"),
+            male = sum(Sex == "M"),
             eastAsian = sum(Race == "east asian"),
             white = sum(Race == "white"),
             interracial = sum(Race == "interracial"),
             black = sum(Race == "black"),
-            high = sum(Quartile == "high"),
-            low = sum(Quartile == "low"))
+            high = sum(Group == "high"),
+            low = sum(Group == "low"))
 
 t_demo.data <- as.data.frame(t(demo.data))
-t_demo.data <- t_demo.data[-c(1),]
-names(t_demo.data) <- c("count or M", "count or M")
+names(t_demo.data) <- c("count or M")
 rownames(t_demo.data) <- c("N", "Mean Age", "Female", "Male", 
                            "East Asian", "White", "Interracial", "Black", "High NCP", "Low NCP")
 
 knitr::kable(format(t_demo.data, digits = 5, drop0trailing = TRUE), caption = "Participant Demographics") %>%
   kable_styling(c("striped", full_width = F)) %>%
-  add_header_above(c(" " =1, "HC" =1, "NCP" =1)) %>%
   pack_rows("Sex", 3, 4) %>%
   pack_rows("Race", 5, 8) %>%
   pack_rows("NCP group", 9, 10)
@@ -89,41 +78,7 @@ Participant Demographics
 
 <tr>
 
-<th style="border-bottom:hidden" colspan="1">
-
-</th>
-
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
-
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-
-HC
-
-</div>
-
-</th>
-
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
-
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-
-NCP
-
-</div>
-
-</th>
-
-</tr>
-
-<tr>
-
 <th style="text-align:left;">
-
-</th>
-
-<th style="text-align:left;">
-
-count or M
 
 </th>
 
@@ -149,12 +104,6 @@ N
 
 <td style="text-align:left;">
 
-69
-
-</td>
-
-<td style="text-align:left;">
-
 66
 
 </td>
@@ -171,13 +120,7 @@ Mean Age
 
 <td style="text-align:left;">
 
-21.46377
-
-</td>
-
-<td style="text-align:left;">
-
-20.37500
+20.375
 
 </td>
 
@@ -185,7 +128,7 @@ Mean Age
 
 <tr grouplength="2">
 
-<td colspan="3" style="border-bottom: 1px solid;">
+<td colspan="2" style="border-bottom: 1px solid;">
 
 <strong>Sex</strong>
 
@@ -198,12 +141,6 @@ Mean Age
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Female
-
-</td>
-
-<td style="text-align:left;">
-
-43
 
 </td>
 
@@ -225,12 +162,6 @@ Male
 
 <td style="text-align:left;">
 
-26
-
-</td>
-
-<td style="text-align:left;">
-
 16
 
 </td>
@@ -239,7 +170,7 @@ Male
 
 <tr grouplength="4">
 
-<td colspan="3" style="border-bottom: 1px solid;">
+<td colspan="2" style="border-bottom: 1px solid;">
 
 <strong>Race</strong>
 
@@ -252,12 +183,6 @@ Male
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 East Asian
-
-</td>
-
-<td style="text-align:left;">
-
-6
 
 </td>
 
@@ -279,12 +204,6 @@ White
 
 <td style="text-align:left;">
 
-32
-
-</td>
-
-<td style="text-align:left;">
-
 29
 
 </td>
@@ -296,12 +215,6 @@ White
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 Interracial
-
-</td>
-
-<td style="text-align:left;">
-
-5
 
 </td>
 
@@ -323,12 +236,6 @@ Black
 
 <td style="text-align:left;">
 
-11
-
-</td>
-
-<td style="text-align:left;">
-
 8
 
 </td>
@@ -337,7 +244,7 @@ Black
 
 <tr grouplength="2">
 
-<td colspan="3" style="border-bottom: 1px solid;">
+<td colspan="2" style="border-bottom: 1px solid;">
 
 <strong>NCP group</strong>
 
@@ -350,12 +257,6 @@ Black
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 High NCP
-
-</td>
-
-<td style="text-align:left;">
-
-0
 
 </td>
 
@@ -377,12 +278,6 @@ Low NCP
 
 <td style="text-align:left;">
 
-34
-
-</td>
-
-<td style="text-align:left;">
-
 37
 
 </td>
@@ -395,43 +290,26 @@ Low NCP
 
 ### Let’s talk about sex distribution baby
 
-In the high-NCP group, 22 are Female and 6 are Male. In the low NCP
-group, 26 are Female and 10 are Male.  
-In the healthy control group, all of which were low NCP, 23 were Female
-and 11 were Male.  
-Given that the sexes are fairly evenly distributed across the four
-quartiles, HC group data were not used in this analyses.
+Conducting Chi-square test to test the independence between two
+variables – (1) Group (high vs. low), (2) Sex (M vs. F)
 
 ``` r
-#By quartile
-  #CAPE Positive Frequency scores are used to define NCP
-  #1st Q: 0-5, 2nd Q: 6-8, 3rd Q: 9-11, 4th Q: 12 and above
-  #9(Median) used as a cutoff for median split
-  #Low NCP = 1st & 2nd Q, High NCP = 3rd & 4th
-quartile <- master.data %>% dplyr::group_by(Group) %>%
-  dplyr::summarise(F.1st = sum(Sex == "Female" & Pos_Freq < 6, na.rm = T),
-            F.2nd = sum(Sex == "Female" & 5 < Pos_Freq & Pos_Freq < 9, na.rm = T),
-            F.3rd = sum(Sex == "Female" & 8 < Pos_Freq & Pos_Freq < 12, na.rm = T),
-            F.4th = sum(Sex == "Female" & 11 < Pos_Freq, na.rm = T),
-            M.1st = sum(Sex == "Male" & Pos_Freq < 6, na.rm = T),
-            M.2nd = sum(Sex == "Male" & 5 < Pos_Freq & Pos_Freq < 9, na.rm = T),
-            M.3rd = sum(Sex == "Male" & 8 < Pos_Freq & Pos_Freq < 12, na.rm = T),
-            M.4th = sum(Sex == "Male" & 11 < Pos_Freq, na.rm = T))
+# Chi-square to test whether group is independent from sex
+test <- chisq.test(table(data$Group, data$Sex))
+X_squared = test[["statistic"]]; df = test[["parameter"]]; p.value = test[["p.value"]]; method = test[["method"]]
+test.frame <- data.frame(X_squared, df, p.value, method)
+row.names(test.frame) <- NULL
 
-quartile = select(quartile, -1)
-names(quartile) <- c("1st", "2nd", "3rd", "4th", "1st", "2nd", "3rd", "4th")
-rownames(quartile) <- c("HC", "NCP")
-
-knitr::kable(quartile, caption = "Gender Distribution by Quartile") %>%
-  kable_styling(c("striped", full_width = F)) %>%
-  add_header_above(c(" " =1, "Female" =4, "Male" =4))
+knitr::kable(format(test.frame, digits = 5, drop0trailing = TRUE), 
+             caption = "p-value > .05, Group (high vs. low) and Sex (M vs. F) are independent") %>% 
+             kable_styling(c("striped", "bordered", full_width = F))
 ```
 
-<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
 
 <caption>
 
-Gender Distribution by Quartile
+p-value \> .05, Group (high vs. low) and Sex (M vs. F) are independent
 
 </caption>
 
@@ -439,83 +317,27 @@ Gender Distribution by Quartile
 
 <tr>
 
-<th style="border-bottom:hidden" colspan="1">
+<th style="text-align:left;">
+
+X\_squared
 
 </th>
-
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
-
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-
-Female
-
-</div>
-
-</th>
-
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
-
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-
-Male
-
-</div>
-
-</th>
-
-</tr>
-
-<tr>
 
 <th style="text-align:left;">
 
-</th>
-
-<th style="text-align:right;">
-
-1st
+df
 
 </th>
 
-<th style="text-align:right;">
+<th style="text-align:left;">
 
-2nd
-
-</th>
-
-<th style="text-align:right;">
-
-3rd
+p.value
 
 </th>
 
-<th style="text-align:right;">
+<th style="text-align:left;">
 
-4th
-
-</th>
-
-<th style="text-align:right;">
-
-1st
-
-</th>
-
-<th style="text-align:right;">
-
-2nd
-
-</th>
-
-<th style="text-align:right;">
-
-3rd
-
-</th>
-
-<th style="text-align:right;">
-
-4th
+method
 
 </th>
 
@@ -529,113 +351,25 @@ Male
 
 <td style="text-align:left;">
 
-HC
+0.36906
 
 </td>
 
-<td style="text-align:right;">
-
-18
-
-</td>
-
-<td style="text-align:right;">
-
-5
-
-</td>
-
-<td style="text-align:right;">
-
-0
-
-</td>
-
-<td style="text-align:right;">
-
-0
-
-</td>
-
-<td style="text-align:right;">
-
-9
-
-</td>
-
-<td style="text-align:right;">
+<td style="text-align:left;">
 
 2
 
 </td>
 
-<td style="text-align:right;">
+<td style="text-align:left;">
 
-0
-
-</td>
-
-<td style="text-align:right;">
-
-0
+0.8315
 
 </td>
-
-</tr>
-
-<tr>
 
 <td style="text-align:left;">
 
-NCP
-
-</td>
-
-<td style="text-align:right;">
-
-16
-
-</td>
-
-<td style="text-align:right;">
-
-10
-
-</td>
-
-<td style="text-align:right;">
-
-6
-
-</td>
-
-<td style="text-align:right;">
-
-16
-
-</td>
-
-<td style="text-align:right;">
-
-5
-
-</td>
-
-<td style="text-align:right;">
-
-5
-
-</td>
-
-<td style="text-align:right;">
-
-3
-
-</td>
-
-<td style="text-align:right;">
-
-3
+Pearson’s Chi-squared test
 
 </td>
 
@@ -646,9 +380,102 @@ NCP
 </table>
 
 ``` r
-#Master dataset used in current analysis, excludes HC (ID 4XXX) 
-data.clean <- master.data[!(master.data$Subject.ID <5000), ]
+# Chi-square to test whether Group is independent from sex
+  # CAPE Positive Frequency scores are used to define NCP
+  # 1st Q: 0-5, 2nd Q: 6-8, 3rd Q: 9-11, 4th Q: 12 and above
+  # 9(Median) used as a cutoff for median split
+  # Low NCP = 1st & 2nd Q, High NCP = 3rd & 4th
+data$Quartile <- ifelse(data$Pos_Freq < 6, "1st",
+                         ifelse(5<data$Pos_Freq & data$Pos_Freq<9, "2nd",
+                          ifelse(8<data$Pos_Freq & data$Pos_Freq<12, "3rd",
+                           ifelse(11<data$Pos_Freq, "4th", NA))))
+
+data <- data[, c(1:5, 52, 6:51)] # reordering columns so that Quartile column is next to CAPE score
+
+test2 <- chisq.test(table(data$Sex, data$Quartile))
+X_squared = test2[["statistic"]]; df = test2[["parameter"]]; p.value = test2[["p.value"]]; method = test2[["method"]]
+test2.frame <- data.frame(X_squared, df, p.value, method)
+row.names(test2.frame) <- NULL
+
+knitr::kable(format(test2.frame, digits = 5, drop0trailing = TRUE), 
+             caption = "p-value > .05, Quartiles (1, 2, 3, 4)) and Sex (M vs. F) are independent") %>% 
+             kable_styling(c("striped", "bordered", full_width = F))
 ```
+
+<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
+
+<caption>
+
+p-value \> .05, Quartiles (1, 2, 3, 4)) and Sex (M vs. F) are
+independent
+
+</caption>
+
+<thead>
+
+<tr>
+
+<th style="text-align:left;">
+
+X\_squared
+
+</th>
+
+<th style="text-align:left;">
+
+df
+
+</th>
+
+<th style="text-align:left;">
+
+p.value
+
+</th>
+
+<th style="text-align:left;">
+
+method
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td style="text-align:left;">
+
+2.9604
+
+</td>
+
+<td style="text-align:left;">
+
+6
+
+</td>
+
+<td style="text-align:left;">
+
+0.8138
+
+</td>
+
+<td style="text-align:left;">
+
+Pearson’s Chi-squared test
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 ### Self Report Data
 
@@ -656,149 +483,70 @@ Preliminary data suggests CAPE positive frequency scores are positively
 correlated with BAI scores
 
 ``` r
-#Using colorbrewer for da ~aesthetics~
-pal <- brewer.pal(12, "Set3")
-blue.pal <- brewer.pal(5, "BuPu")
-purp.pal <- brewer.pal(8, "Purples")
-
 #Self Report data (CAPE positive & total, LSHS, BAI, BIS, BAS)
-selfReport <- data.clean %>% select(Subject.ID, Pos_Freq, CAPE.sum, LSHS.sum, HPS.sum, BAI.sum, BIS.sum, BAS.fun, BAS.reward, BAS.drive, BAS.sum) 
+SR <- data %>% select(Subject.ID, Group, Pos_Freq, CAPE.sum, LSHS.sum, HPS.sum, BAI.sum, BIS.sum, BAS.fun, BAS.reward, BAS.drive, BAS.sum) 
 
-sR.table <- selfReport %>%
-  summarise(mean.CAPE = mean(Pos_Freq, na.rm = T),
-            mean.LSHS = mean(LSHS.sum, na.rm = T),
-            mean.BAI = mean (BAI.sum, na.rm = T),
-            mean.BIS = mean(BIS.sum, na.rm = T),
-            mean.BAS = mean(BAS.sum, na.rm = T)) %>%
-  dplyr::rename("mean CAPE (Pos Freq)" = "mean.CAPE", "mean LSHS" = "mean.LSHS", 
-         "mean BAI" = "mean.BAI", "mean BIS" = "mean.BIS", "mean BAS" = "mean.BAS")
-
-knitr::kable(format(sR.table, digits = 5, drop0trailing = TRUE), caption = "Mean Self Report Scores") %>%
-  kable_styling(c("striped", "bordered"))
+# BAI-CAPE regression graph 
+ggplot(SR, aes(x=Pos_Freq, y=BAI.sum, col = Group)) + 
+ geom_point() +
+  geom_smooth(method = lm , se = TRUE) +
+   labs(title = "Correlation between CAPE score (Positive Frequency Only) and BAI score",
+       x = "CAPE Positive Frequency score", y = "BAI score") +
+  theme_classic() +
+  stat_cor(method = "pearson", label.x = c(12, 3), label.y = c(30, 30)) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1"))
 ```
 
-<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
-
-<caption>
-
-Mean Self Report Scores
-
-</caption>
-
-<thead>
-
-<tr>
-
-<th style="text-align:left;">
-
-mean CAPE (Pos Freq)
-
-</th>
-
-<th style="text-align:left;">
-
-mean LSHS
-
-</th>
-
-<th style="text-align:left;">
-
-mean BAI
-
-</th>
-
-<th style="text-align:left;">
-
-mean BIS
-
-</th>
-
-<th style="text-align:left;">
-
-mean BAS
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:left;">
-
-8.3939
-
-</td>
-
-<td style="text-align:left;">
-
-10.83
-
-</td>
-
-<td style="text-align:left;">
-
-13.309
-
-</td>
-
-<td style="text-align:left;">
-
-23.696
-
-</td>
-
-<td style="text-align:left;">
-
-38.022
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+![](NCP_Analysis_Prelim_files/figure-gfm/selfreport-1.png)<!-- -->
 
 ``` r
-# CAPE Positive Frequency vs. BAI
-summary(lm(selfReport$BAI.sum~selfReport$Pos_Freq)) #linear regression summary
+# Linear Regression Summary 
+low.NCP <- SR %>% filter(Group == "low")
+summary(lm(low.NCP$BAI.sum~low.NCP$Pos_Freq)) # no significant relationship between BAI and CAPE
 ```
 
     ## 
     ## Call:
-    ## lm(formula = selfReport$BAI.sum ~ selfReport$Pos_Freq)
+    ## lm(formula = low.NCP$BAI.sum ~ low.NCP$Pos_Freq)
     ## 
     ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -20.723  -6.208  -2.981   2.648  40.921 
+    ##    Min     1Q Median     3Q    Max 
+    ## -7.367 -5.866 -3.866  2.384 21.134 
     ## 
     ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)   
-    ## (Intercept)           6.0995     2.6701   2.284  0.02638 * 
-    ## selfReport$Pos_Freq   0.8812     0.2709   3.252  0.00199 **
+    ##                  Estimate Std. Error t value Pr(>|t|)  
+    ## (Intercept)        7.2233     2.6946   2.681    0.012 *
+    ## low.NCP$Pos_Freq   0.6429     0.5699   1.128    0.269  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 11.04 on 53 degrees of freedom
-    ##   (11 observations deleted due to missingness)
-    ## Multiple R-squared:  0.1664, Adjusted R-squared:  0.1507 
-    ## F-statistic: 10.58 on 1 and 53 DF,  p-value: 0.001993
+    ## Residual standard error: 8.159 on 29 degrees of freedom
+    ##   (6 observations deleted due to missingness)
+    ## Multiple R-squared:  0.04203,    Adjusted R-squared:  0.009002 
+    ## F-statistic: 1.273 on 1 and 29 DF,  p-value: 0.2685
 
 ``` r
-ggplot(selfReport, aes(x=Pos_Freq, y=BAI.sum), na.rm = TRUE) + geom_point(color = pal[1]) +
- geom_smooth(method = lm , se = TRUE, color = pal[1]) +
- ggtitle("Correlation between CAPE score (Positive Frequency Only) and BAI score") + 
-  xlab("CAPE Positive Frequency score") +
-  ylab("BAI score") +
-  theme_classic() +
-  stat_cor(method = "pearson", label.x = 3, label.y = 30)
+high.NCP <- SR %>% filter(Group == "high")
+summary(lm(high.NCP$BAI.sum~high.NCP$Pos_Freq)) # no significant relationship between BAI and CAPE
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/selfreport-1.png)<!-- -->
+    ## 
+    ## Call:
+    ## lm(formula = high.NCP$BAI.sum ~ high.NCP$Pos_Freq)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -23.859 -10.335  -0.585   5.017  39.369 
+    ## 
+    ## Coefficients:
+    ##                   Estimate Std. Error t value Pr(>|t|)
+    ## (Intercept)         -1.327     14.241  -0.093    0.927
+    ## high.NCP$Pos_Freq    1.409      1.023   1.377    0.182
+    ## 
+    ## Residual standard error: 14.24 on 22 degrees of freedom
+    ##   (5 observations deleted due to missingness)
+    ## Multiple R-squared:  0.07938,    Adjusted R-squared:  0.03753 
+    ## F-statistic: 1.897 on 1 and 22 DF,  p-value: 0.1823
 
 ### PCET (Penn Conditional Exclusion Task) Performance
 
@@ -817,7 +565,7 @@ al., 2019)
 Cues](/Users/Jadyn/Documents/GitHub/Anxiety-NCP/pcet_cue.png)
 
 ``` r
-pcet.data <- data.clean %>% select(Subject.ID, Sex, Quartile, PCET_NUM, PCETCR, PCETER, PCETRTCR, PCETRTER, PCET_CAT, CAT1_TR, CAT2_TR, CAT3_TR, PCET_EFF)
+pcet <- data %>% select(Subject.ID, Group, PCET_NUM, PCETCR, PCETER, PCETRTCR, PCETRTER, PCET_CAT, CAT1_TR, CAT2_TR, CAT3_TR, PCET_EFF)
 
 # PCET_NUM = total number of responses (correct + incorrect)
 # PCETCR = total number of correct responses 
@@ -832,9 +580,7 @@ pcet.data <- data.clean %>% select(Subject.ID, Sex, Quartile, PCET_NUM, PCETCR, 
 # CAT3_TR = same as above but for the last category
   # if participant never got the rule, default is to complete 48 trials
 
-pcet.melt <- melt(pcet.data, id.vars = c("Quartile", "Subject.ID"), variable_name="metric") #as a list
-pcet.melt <- pcet.melt[!(pcet.melt$variable == "Sex"), ] %>% #excluding sex as a variable
-  filter(Quartile == "low" | Quartile == "high")
+pcet.melt <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric") #as a list
 pcet.melt$value <- as.numeric(pcet.melt$value, na.rm = T) #value as numeric
 
 pcet.fx <- function(data, varname, groupnames){
@@ -849,18 +595,20 @@ pcet.fx <- function(data, varname, groupnames){
  return(data_sum)
 } #function for SummaryWithin2 package -- calculates mean and sd
 
-pcet.summary <- pcet.fx(pcet.melt, varname="value", groupnames=c("Quartile", "variable")) #summarized by quartile & variable (total, correct, incorrect)
+pcet.summary <- pcet.fx(pcet.melt, varname="value", groupnames=c("Group", "variable")) #summarized by quartile & variable (total, correct, incorrect)
 
 # 1. Number of Correct, Incorrect, and Total Trials in High vs. Low NCP
-pcet.group1 <- pcet.summary %>% filter(variable == "PCET_NUM" | variable == "PCETCR" | variable == "PCETER")
-pcet.group1$variable <- c("PCET_NUM" = "Total", "PCETCR" = "CR", "PCETER" = "IR")
+trials <- c("PCET_NUM", "PCETCR", "PCETER")
+pcet.group1 <- pcet.summary %>% filter(variable %in% trials)
+pcet.group1$variable <- c("PCET_NUM" = "Total", "PCETCR" = "Correct", "PCETER" = "Incorrect")
 
+# Graph of Correct, Incorrect, Total Trials By Group 
 ggplot(pcet.group1, aes(x = variable, y = value, fill = variable)) +
   geom_bar(position = "dodge", stat = "identity") + 
   geom_errorbar(aes(ymin = value-sd, ymax = value+sd), width = .2,
                     position = position_dodge(.9)) +
-  facet_grid(.~Quartile) +
-  scale_fill_brewer() +
+  facet_grid(.~Group) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   ggtitle("Mean # Correct and Incorrect Trials in High vs. Low NCP") + 
   xlab("Mean Total, Correct, and Incorrect Responses") +
   ylab("# Trials") +
@@ -878,8 +626,8 @@ ggplot(pcet.group1, aes(x = variable, y = value, fill = variable)) +
 ``` r
 # 1.1 Significance Test
 ##Total Responses
-total.high <- subset(pcet.melt, Quartile == "high" & variable == "PCET_NUM")
-total.low <- subset(pcet.melt, Quartile == "low" & variable == "PCET_NUM")
+total.high <- subset(pcet.melt, Group == "high" & variable == "PCET_NUM")
+total.low <- subset(pcet.melt, Group == "low" & variable == "PCET_NUM")
 #var.test(total.high$value, total.low$value) ##Fisher's F-test, p<0.05; heterogeneous sample
 t.test(total.high$value, total.low$value, var.equal = FALSE) #two-sample t test, p = 0.0117; significant difference in total number of responses between high vs. low NCP
 ```
@@ -899,11 +647,11 @@ t.test(total.high$value, total.low$value, var.equal = FALSE) #two-sample t test,
 ``` r
 ############# Effect Size #############
 high.m = pcet.group1[1,3]
-high.n = sum(pcet.melt$Quartile=="high" & pcet.melt$variable=="PCET_NUM")
+high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCET_NUM")
 high.sd =  pcet.group1[1,4]
 low.m = pcet.group1[4,3]
 low.sd = pcet.group1[4,4]
-low.n = sum(pcet.melt$Quartile=="low" & pcet.melt$variable=="PCET_NUM")
+low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCET_NUM")
 
 mean.diff = high.m - low.m
 sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
@@ -912,8 +660,8 @@ cohensD = mean.diff/sd.pooled
 
 
 ##Correct Responses
-correct.high <- subset(pcet.melt, Quartile == "high" & variable == "PCETCR")
-correct.low <- subset(pcet.melt, Quartile == "low" & variable == "PCETCR")
+correct.high <- subset(pcet.melt, Group == "high" & variable == "PCETCR")
+correct.low <- subset(pcet.melt, Group == "low" & variable == "PCETCR")
 #var.test(correct.high$value, correct.low$value) #Fisher's F-test, p>0.05; both samples are homogeneous
 t.test(correct.high$value, correct.low$value, var.equal = TRUE) #two-sample t-test, p = 0.4882; no significant difference in total number of correct responses between low vs. high NCP
 ```
@@ -932,8 +680,8 @@ t.test(correct.high$value, correct.low$value, var.equal = TRUE) #two-sample t-te
 
 ``` r
 ###Incorrect Responses
-incorr.high <- subset(pcet.melt, Quartile == "high" & variable == "PCETER")
-incorr.low <- subset(pcet.melt, Quartile == "low" & variable == "PCETER")
+incorr.high <- subset(pcet.melt, Group == "high" & variable == "PCETER")
+incorr.low <- subset(pcet.melt, Group == "low" & variable == "PCETER")
 #var.test(incorr.high$value, incorr.low$value) #Fisher's F-test, p>0.05; both samples are homogeneous
 t.test(incorr.high$value, incorr.low$value, var.equal = TRUE) #two-sample t-test, p = 0.0069; significant difference in total number of incorrect responses between low vs. high NCP
 ```
@@ -953,11 +701,11 @@ t.test(incorr.high$value, incorr.low$value, var.equal = TRUE) #two-sample t-test
 ``` r
 ############# Effect Size #############
 high.m = pcet.group1[3,3]
-high.n = sum(pcet.melt$Quartile=="high" & pcet.melt$variable=="PCETER")
+high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCETER")
 high.sd =  pcet.group1[3,4]
 low.m = pcet.group1[6,3]
 low.sd = pcet.group1[6,4]
-low.n = sum(pcet.melt$Quartile=="low" & pcet.melt$variable=="PCETER")
+low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCETER")
 
 mean.diff = high.m-low.m
 sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
@@ -966,15 +714,17 @@ cohensD = mean.diff/sd.pooled
 
 
 # 2. RT of Correct and Incorrect Trials in High vs. Low NCP
-pcet.group2 <- pcet.summary %>% filter(variable == "PCETRTCR" | variable == "PCETRTER")
+reac <- c("PCETRTCR", "PCETRTER")
+pcet.group2 <- pcet.summary %>% filter(variable %in% reac)
 pcet.group2$variable <- c("PCETRTCR" = "RT Correct", "PCETRTER" = "RT Incorrect")
 
+# Graph of Correct and Incorrect Trials by Group
 ggplot(pcet.group2, aes(x = variable, y = value, fill = variable)) +
   geom_bar(position = "dodge", stat = "identity") +
   geom_errorbar(aes(ymin = value-sd, ymax = value+sd), width = .2,
                     position = position_dodge(.9)) +
-  facet_grid(.~Quartile) +
-  scale_fill_brewer() +
+  facet_grid(.~Group) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   ggtitle("RT of Correct and Incorrect Trials in High vs. Low NCP") + 
   xlab("Mean Correct, and Incorrect Responses") +
   ylab("RT (in ms)") +
@@ -992,8 +742,8 @@ ggplot(pcet.group2, aes(x = variable, y = value, fill = variable)) +
 ``` r
 # 2.1 Significance Test
 ##Correct Responses
-correct.high.rt <- subset(pcet.melt, Quartile == "high" & variable == "PCETRTCR")
-correct.low.rt <- subset(pcet.melt, Quartile == "low" & variable == "PCETRTCR")
+correct.high.rt <- subset(pcet.melt, Group == "high" & variable == "PCETRTCR")
+correct.low.rt <- subset(pcet.melt, Group == "low" & variable == "PCETRTCR")
 #var.test(correct.high.rt$value, correct.low.rt$value) #Fisher's F-test, p<0.05; heterogeneous sample
 t.test(correct.high.rt$value, correct.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.1104; no significant difference in RT of correct responses between low vs. high NCP 
 ```
@@ -1012,8 +762,8 @@ t.test(correct.high.rt$value, correct.low.rt$value, var.equal = FALSE) #Welch t-
 
 ``` r
 ##Incorrect Responses
-incorr.high.rt <- subset(pcet.melt, Quartile == "high" & variable == "PCETRTER")
-incorr.low.rt <- subset(pcet.melt, Quartile == "low" & variable == "PCETRTER")
+incorr.high.rt <- subset(pcet.melt, Group == "high" & variable == "PCETRTER")
+incorr.low.rt <- subset(pcet.melt, Group == "low" & variable == "PCETRTER")
 #var.test(incorr.high.rt$value, incorr.low.rt$value) #Fisher's F-test, p<0.05; heterogeneous sample
 t.test(incorr.high.rt$value, incorr.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.0557; no significant difference in RT of incorrect responses between low vs. high NCP 
 ```
@@ -1033,171 +783,223 @@ t.test(incorr.high.rt$value, incorr.low.rt$value, var.equal = FALSE) #Welch t-st
 ``` r
 ############# Effect Size #############
 high.m = pcet.group2[2,3]
-high.n = sum(pcet.melt$Quartile=="high" & pcet.melt$variable=="PCETRTER")
+high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCETRTER")
 high.sd =  pcet.group2[2,4]
 low.m = pcet.group2[4,3]
 low.sd = pcet.group2[4,4]
-low.n = sum(pcet.melt$Quartile=="low" & pcet.melt$variable=="PCETRTER")
+low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCETRTER")
 
 mean.diff = high.m-low.m
 sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
 cohensD = mean.diff/sd.pooled
 ############# Cohen's D = 0.5671 #############
+```
 
-# 3. Accuracy (% Correct)
-pcet.data <- pcet.data %>% mutate(freq = PCETCR/PCET_NUM)
-pcet.freq <- melt(pcet.data, id.vars = c("Quartile", "Subject.ID"), variable_name="metric")
-pcet.freq <- pcet.freq %>% filter(variable == "freq" & (Quartile == "low" | Quartile == "high"))
+### Performance based on Accuracy, Efficiency, and Composite Score
 
-h.acc<- pcet.freq %>% filter(Quartile == "high") %>% summarise(n = sum(variable=="freq"),
+``` r
+# 1. Accuracy (% Correct)
+pcet <- pcet %>% mutate(freq = PCETCR/PCET_NUM)
+pcet.freq <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric")
+pcet.freq <- pcet.freq %>% filter(variable == "freq")
+
+# N, mean, and SD of high-NCP
+h.acc<- pcet.freq %>% filter(Group == "high") %>% summarise(n = sum(variable=="freq"),
                                                             mean = mean(as.numeric(value), na.rm = T),
-                                                            sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of high NCP
+                                                            sd = sd(as.numeric(value), na.rm = T)) 
 
-l.acc <- pcet.freq %>% filter(Quartile == "low") %>% summarise(n = sum(variable=="freq"),
+# N, mean, and SD of low-NCP
+l.acc <- pcet.freq %>% filter(Group == "low") %>% summarise(n = sum(variable=="freq"),
                                                            mean = mean(as.numeric(value), na.rm = T),
-                                                           sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of low NCP
+                                                           sd = sd(as.numeric(value), na.rm = T)) 
 
 high.freq <- data.frame(hf = rnorm(h.acc$n, h.acc$mean, h.acc$sd)) # normalized
 low.freq <- data.frame(lf = rnorm(l.acc$n, l.acc$mean, l.acc$sd))
 
+# Density Plot of Accuracy by Group
 ggplot() +
-  geom_density(data = high.freq, aes(x = hf),
-               fill = "#E6E6FA", color = "black", alpha = .5) +
-  geom_density(data = low.freq, aes(x = lf),
-               fill = "#FFDAB9", color = "black", alpha = .5) +
+  geom_density(data = high.freq, aes(x = hf), 
+               fill = "#145A32", color = "black", alpha = .5) + 
+  geom_density(data = low.freq, aes(x = lf), 
+               fill = "#F7DC6F", color = "black", alpha = .5) + 
   theme_classic() +
   ggtitle("Accuracy (% Correct) in high vs. low NCP") +
   xlab("Accuracy (% Correct)") 
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-1.png)<!-- -->
 
 ``` r
-# 3.1 Box Plot
-ggplot(pcet.freq, aes(x=variable, y=as.numeric(value), fill = Quartile), na.rm = TRUE) +
+# Box Plot of Accuracy by Group
+ggplot(pcet.freq, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
   geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
   theme_classic() +
-  scale_fill_manual(values = c("#E6E6FA", "#FFDAB9")) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   labs(title = "Accuracy by Group", y = "Accuracy")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-4.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-2.png)<!-- -->
 
 ``` r
-# 3.2 Significance Test
-freq.high <- subset(pcet.freq, Quartile == "high")
-freq.low <- subset(pcet.freq, Quartile == "low")
+# Significance Test of Accuracy by Group
+freq.high <- subset(pcet.freq, Group == "high")
+freq.low <- subset(pcet.freq, Group == "low")
 #var.test(as.numeric(freq.high$value), as.numeric(freq.low$value)) #Fisher's F-test, p>0.05; homogeneous sample
-#t.test(as.numeric(freq.high$value), as.numeric(freq.low$value, var.equal = TRUE)) # p = 0.020
+t.test(as.numeric(freq.high$value), as.numeric(freq.low$value, var.equal = TRUE)) # p = 0.020
+```
 
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  as.numeric(freq.high$value) and as.numeric(freq.low$value, var.equal = TRUE)
+    ## t = -2.4117, df = 46.505, p-value = 0.01988
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.1987507 -0.0179414
+    ## sample estimates:
+    ## mean of x mean of y 
+    ## 0.5999165 0.7082625
 
-# 4. Efficiency
+``` r
+# 2. Efficiency
 pcet.eff <- pcet.melt %>% filter(variable=="PCET_EFF")
 
-h.eff <- pcet.eff %>% filter(Quartile == "high") %>% summarise(n = sum(variable=="PCET_EFF"),
+# N, mean, and SD of high-NCP
+h.eff <- pcet.eff %>% filter(Group == "high") %>% summarise(n = sum(variable=="PCET_EFF"),
                                                             mean = mean(as.numeric(value), na.rm = T),
-                                                            sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of high NCP
-
-l.eff <- pcet.eff %>% filter(Quartile == "low") %>% summarise(n = sum(variable=="PCET_EFF"),
+                                                            sd = sd(as.numeric(value), na.rm = T)) 
+# N, mean, and SD of low-NCP
+l.eff <- pcet.eff %>% filter(Group == "low") %>% summarise(n = sum(variable=="PCET_EFF"),
                                                            mean = mean(as.numeric(value), na.rm = T),
-                                                           sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of low NCP
+                                                           sd = sd(as.numeric(value), na.rm = T)) 
 
 high.eff <- data.frame(he = rnorm(h.eff$n, h.eff$mean, h.eff$sd)) # normalized
 low.eff <- data.frame(le = rnorm(l.eff$n, l.eff$mean, l.eff$sd))
 
+# Density Plot of Efficiency By Group
 ggplot() +
   geom_density(data = high.eff, aes(x = he),
-               fill = "#E6E6FA", color = "black", alpha = .5) +
+               fill = "#145A32", color = "black", alpha = .5) +
   geom_density(data = low.eff, aes(x = le),
-               fill = "#FFDAB9", color = "black", alpha = .5) +
+               fill = "#F7DC6F", color = "black", alpha = .5) +
   theme_classic() +
   ggtitle("Efficiency in high vs. low NCP") +
   xlab("Efficiency") 
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-5.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-3.png)<!-- -->
 
 ``` r
-# 4.1 Box Plot
-ggplot(pcet.eff, aes(x=variable, y=as.numeric(value), fill = Quartile), na.rm = TRUE) +
+# Box Plot of Efficiency by Group 
+ggplot(pcet.eff, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
   geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
   theme_classic() +
-  scale_fill_manual(values = c("#E6E6FA", "#FFDAB9")) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   labs(title = "Efficiency by Group", y = "Efficiency")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-6.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-4.png)<!-- -->
 
 ``` r
-# 4.2 Significance Test
-eff.high <- subset(pcet.eff, Quartile == "high")
-eff.low <- subset(pcet.eff, Quartile == "low")
+# Significance Test of Efficiency by Group 
+eff.high <- subset(pcet.eff, Group == "high")
+eff.low <- subset(pcet.eff, Group == "low")
 #var.test(eff.high$value, eff.low$value) #Fisher's F-test, p>0.05; homogeneous sample
-#t.test(eff.high$value, eff.low$value, var.equal = TRUE) #p=0.0123
+t.test(eff.high$value, eff.low$value, var.equal = TRUE) #p=0.0123
+```
 
-# 5. Composite score
-pcet.data <- pcet.data %>% mutate(score = PCET_CAT * freq)
-pcet.score <- melt(pcet.data, id.vars = c("Quartile", "Subject.ID"), variable_name="metric") 
-pcet.score <- pcet.score %>% filter(variable == "score" & (Quartile == "low" | Quartile == "high")) 
+    ## 
+    ##  Two Sample t-test
+    ## 
+    ## data:  eff.high$value and eff.low$value
+    ## t = -2.5859, df = 55, p-value = 0.01239
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.11453122 -0.01451954
+    ## sample estimates:
+    ## mean of x mean of y 
+    ## 0.2139292 0.2784545
 
-h.sc <- pcet.score %>% filter(Quartile == "high") %>% summarise(n = sum(variable=="score"),
+``` r
+# 3. Composite score
+pcet <- pcet %>% mutate(score = PCET_CAT * freq)
+pcet.score <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric") 
+pcet.score <- pcet.score %>% filter(variable == "score") 
+
+# N, mean, and SD of high-NCP
+h.sc <- pcet.score %>% filter(Group == "high") %>% summarise(n = sum(variable=="score"),
                                                             mean = mean(as.numeric(value), na.rm = T),
-                                                            sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of high NCP
+                                                            sd = sd(as.numeric(value), na.rm = T))
 
-l.sc <- pcet.score %>% filter(Quartile == "low") %>% summarise(n = sum(variable=="score"),
+# N, mean, and SD of low-NCP
+l.sc <- pcet.score %>% filter(Group == "low") %>% summarise(n = sum(variable=="score"),
                                                            mean = mean(as.numeric(value), na.rm = T),
-                                                           sd = sd(as.numeric(value), na.rm = T)) #n, mean, and sd of low NCP
+                                                           sd = sd(as.numeric(value), na.rm = T)) 
 
 high.score <- data.frame(hs = rnorm(h.sc$n, h.sc$mean, h.sc$sd)) # normalized
 low.score <- data.frame(ls = rnorm(l.sc$n, l.sc$mean, l.sc$sd))
 
+# Density Plot of Composite Score by Group
 ggplot() +
   geom_density(data = high.score, aes(x = hs),
-               fill = "#E6E6FA", color = "black", alpha = .5) +
+               fill = "#145A32", color = "black", alpha = .5) +
   geom_density(data = low.score, aes(x = ls),
-               fill = "#FFDAB9", color = "black", alpha = .5) +
+               fill = "#F7DC6F", color = "black", alpha = .5) +
   theme_classic() +
   ggtitle("Composite Score in high vs. low NCP") +
   xlab("Score") 
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-7.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-5.png)<!-- -->
 
 ``` r
-# 5.1 Box Plot
-ggplot(pcet.score, aes(x=variable, y=as.numeric(value), fill = Quartile), na.rm = TRUE) +
+# Box Plot of Composite Score by Group
+ggplot(pcet.score, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
   geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
   theme_classic() +
-  scale_fill_manual(values = c("#E6E6FA", "#FFDAB9")) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   labs(title = "Composite Score by Group", y = "Score")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-8.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-6.png)<!-- -->
 
 ``` r
-# 5.1 Significance Test
-score.high <- subset(pcet.score, Quartile == "high")
-score.low <- subset(pcet.score, Quartile == "low")
+# Significance Test of Composite Score by Group
+score.high <- subset(pcet.score, Group == "high")
+score.low <- subset(pcet.score, Group == "low")
 #var.test(as.numeric(score.high$value), as.numeric(score.low$value)) #homogeneous
-#t.test(as.numeric(score.high$value), as.numeric(score.low$value), var.equal=T) #p=0.014
+t.test(as.numeric(score.high$value), as.numeric(score.low$value), var.equal=T) #p=0.014
 ```
+
+    ## 
+    ##  Two Sample t-test
+    ## 
+    ## data:  as.numeric(score.high$value) and as.numeric(score.low$value)
+    ## t = -2.5588, df = 55, p-value = 0.01328
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.82013849 -0.09971838
+    ## sample estimates:
+    ## mean of x mean of y 
+    ##  1.581096  2.041024
 
 ### PCET Performance by Block
 
 ``` r
-pcet.melt <- pcet.melt %>% select(Quartile, variable, value)
-pcet.block <- pcet.melt %>% filter(variable == c("CAT1_TR", "CAT2_TR", "CAT3_TR")) %>%
-  dplyr::group_by(Quartile, variable) %>%
+pcet.melt <- pcet.melt %>% select(Group, variable, value)
+blocks <- c("CAT1_TR", "CAT2_TR", "CAT3_TR")
+pcet.block <- pcet.melt %>% filter(variable %in% blocks) %>%
+  dplyr::group_by(Group, variable) %>%
   dplyr::summarise(Trials = mean(value, na.rm = T))
 
 #Number of Trials by Block
-ggplot(pcet.block, aes(x = variable, y = Trials, group = Quartile)) +
-  geom_line(aes(linetype = Quartile, color = Quartile)) +
+ggplot(pcet.block, aes(x = variable, y = Trials, group = Group)) +
+  geom_line(aes(linetype = Group, color = Group)) +
   geom_point() +
-  scale_color_brewer(palette = "Accent") +
+  scale_color_manual(values = wes_palette(n=3, name = "Chevalier1")) +
   theme_classic()
 ```
 
@@ -1206,16 +1008,14 @@ ggplot(pcet.block, aes(x = variable, y = Trials, group = Quartile)) +
 ### PCET & Clinical Traits
 
 ``` r
-#PCET Performance Type vs. CAPE Positive frequency
-data.clean <- data.clean %>% mutate(freq = as.numeric(PCETCR/PCET_NUM), score = as.numeric(PCET_CAT * freq) )
-pcet.traits <- data.clean %>% select(Pos_Freq, PCET_EFF, freq, score) %>% drop_na()
-pcet.traits <- melt(pcet.traits, id.vars = "Pos_Freq")
-pcet.traits$variable <- c("PCET_EFF" = "Efficiency", "freq" = "Accuracy", "score" = "Score")
+data <- data %>% mutate(freq = as.numeric(PCETCR/PCET_NUM), score = as.numeric(PCET_CAT * freq))
 
-ggplot(pcet.traits, aes(x = Pos_Freq, y = value, col = variable)) + geom_point() +
+# Group x Accuracy Correlation 
+ggplot(data, aes(x = Pos_Freq, y = freq, col = Group)) + geom_point() +
   geom_smooth(method = lm , se = F) +
-  scale_color_brewer(palette = "Accent") +
-  labs(title = "Correlation between CAPE positive score and Performance", x = "CAPE Positive Score", y = "value") +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "Correlation between CAPE positive score and Accuracy by Group",
+       x = "CAPE Positive Score", y = "Accuracy") +
   theme_classic() +
   stat_cor(label.x = 15)
 ```
@@ -1223,11 +1023,12 @@ ggplot(pcet.traits, aes(x = Pos_Freq, y = value, col = variable)) + geom_point()
 ![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-1.png)<!-- -->
 
 ``` r
-#BAI vs. Accuracy by Group
-ggplot(data.clean, aes(x = BAI.sum, y = freq, col = Quartile), na.rm = T) + geom_point() +
+# Group x Efficiency Correlation 
+ggplot(data, aes(x = Pos_Freq, y = PCET_EFF, col = Group)) + geom_point() +
   geom_smooth(method = lm , se = F) +
-  scale_color_brewer(palette = "Accent") +
-  labs(title = "Correlation between BAI score and Accuracy", x = "BAI score", y = "Accuracy") +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "Correlation between CAPE positive score and Efficiency by Group",
+       x = "CAPE Positive Score", y = "Efficiency") +
   theme_classic() +
   stat_cor(label.x = 15)
 ```
@@ -1235,27 +1036,52 @@ ggplot(data.clean, aes(x = BAI.sum, y = freq, col = Quartile), na.rm = T) + geom
 ![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-2.png)<!-- -->
 
 ``` r
+# Group x Composite Score Correlation 
+ggplot(data, aes(x = Pos_Freq, y = score, col = Group)) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "Correlation between CAPE positive score and Composite Score by Group",
+       x = "CAPE Positive Score", y = "PCET Score") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-3.png)<!-- -->
+
+``` r
+# Anxiety x Accuracy Correlation by Group
+ggplot(data, aes(x = BAI.sum, y = freq, col = Group), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "Correlation between BAI score and Accuracy", x = "BAI score", y = "Accuracy") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-4.png)<!-- -->
+
+``` r
 # Does Group x Anxiety Interaction predict Accuracy?
   # X = Anxiety Score, # D = Group (1 = high NCP, 0 = low NCP) # Y = Accuracy
   # Yi = B0 + B1Xi + B2Xi + ui
 
-summary(lm(data = data.clean, freq ~ BAI.sum * Quartile))
+summary(lm(data = data, freq ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = freq ~ BAI.sum * Quartile, data = data.clean)
+    ## lm(formula = freq ~ BAI.sum * Group, data = data)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
     ## -0.36202 -0.13048  0.02811  0.09604  0.27318 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)          0.500528   0.057719   8.672 4.47e-11 ***
-    ## BAI.sum              0.005300   0.002379   2.228   0.0311 *  
-    ## Quartilelow          0.263472   0.074746   3.525   0.0010 ** 
-    ## BAI.sum:Quartilelow -0.010363   0.004467  -2.320   0.0250 *  
+    ##                   Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       0.500528   0.057719   8.672 4.47e-11 ***
+    ## BAI.sum           0.005300   0.002379   2.228   0.0311 *  
+    ## Grouplow          0.263472   0.074746   3.525   0.0010 ** 
+    ## BAI.sum:Grouplow -0.010363   0.004467  -2.320   0.0250 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -1265,36 +1091,36 @@ summary(lm(data = data.clean, freq ~ BAI.sum * Quartile))
     ## F-statistic: 4.216 on 3 and 44 DF,  p-value: 0.0105
 
 ``` r
-#BAI vs. Efficiency by Group
-ggplot(data.clean, aes(x = BAI.sum, y = PCET_EFF, col = Quartile), na.rm = T) + geom_point() +
+# Anxiety x Efficiency Correlation by Group
+ggplot(data, aes(x = BAI.sum, y = PCET_EFF, col = Group), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
-  scale_color_brewer(palette = "Accent") +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "Correlation between BAI score and Efficiency", x = "BAI score", y = "Efficiency") +
   theme_classic() +
   stat_cor(label.x = 15)
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-5.png)<!-- -->
 
 ``` r
 # Does Group x Anxiety Interaction predict Efficiency?
-summary(lm(data = data.clean, PCET_EFF ~ BAI.sum*Quartile))
+summary(lm(data = data, PCET_EFF ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = PCET_EFF ~ BAI.sum * Quartile, data = data.clean)
+    ## lm(formula = PCET_EFF ~ BAI.sum * Group, data = data)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
     ## -0.18753 -0.06787  0.02841  0.06573  0.15829 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)          0.153017   0.032776   4.669 2.86e-05 ***
-    ## BAI.sum              0.003056   0.001351   2.262 0.028699 *  
-    ## Quartilelow          0.155203   0.042444   3.657 0.000679 ***
-    ## BAI.sum:Quartilelow -0.005845   0.002536  -2.304 0.025978 *  
+    ##                   Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       0.153017   0.032776   4.669 2.86e-05 ***
+    ## BAI.sum           0.003056   0.001351   2.262 0.028699 *  
+    ## Grouplow          0.155203   0.042444   3.657 0.000679 ***
+    ## BAI.sum:Grouplow -0.005845   0.002536  -2.304 0.025978 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -1304,36 +1130,36 @@ summary(lm(data = data.clean, PCET_EFF ~ BAI.sum*Quartile))
     ## F-statistic: 4.587 on 3 and 44 DF,  p-value: 0.007031
 
 ``` r
-#BAI vs. Score by Group
-ggplot(data.clean, aes(x = BAI.sum, y = score, col = Quartile), na.rm = T) + geom_point() +
+# Anxiey x Score Correlation by Group 
+ggplot(data, aes(x = BAI.sum, y = score, col = Group), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
-  scale_color_brewer(palette = "Accent") +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "Correlation between BAI score and Composite Score", x = "BAI score", y = "Composite Score") +
   theme_classic() +
   stat_cor(label.x = 15)
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-4.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-6.png)<!-- -->
 
 ``` r
 # Does Group x Anxiety Interaction predict Composite Score?
-summary(lm(data = data.clean, score ~ BAI.sum*Quartile))
+summary(lm(data = data, score ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = score ~ BAI.sum * Quartile, data = data.clean)
+    ## lm(formula = score ~ BAI.sum * Group, data = data)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
     ## -1.3532 -0.5146  0.1394  0.4118  1.1244 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)          1.160502   0.237541   4.885 1.41e-05 ***
-    ## BAI.sum              0.021076   0.009791   2.153 0.036881 *  
-    ## Quartilelow          1.091805   0.307614   3.549 0.000933 ***
-    ## BAI.sum:Quartilelow -0.040721   0.018383  -2.215 0.031970 *  
+    ##                   Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       1.160502   0.237541   4.885 1.41e-05 ***
+    ## BAI.sum           0.021076   0.009791   2.153 0.036881 *  
+    ## Grouplow          1.091805   0.307614   3.549 0.000933 ***
+    ## BAI.sum:Grouplow -0.040721   0.018383  -2.215 0.031970 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 

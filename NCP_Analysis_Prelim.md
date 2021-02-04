@@ -1545,7 +1545,7 @@ pcet.acc %>%
   theme(axis.title.x=element_blank())
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/onbox-1.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-1.png)<!-- -->
 
 ``` r
 ##### 2. Efficiency #####
@@ -1567,7 +1567,7 @@ pcet.eff %>%
   theme(axis.title.x=element_blank())
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/onbox-2.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-2.png)<!-- -->
 
 ``` r
 ##### 3. Score #####
@@ -1589,7 +1589,7 @@ pcet.score %>%
   theme(axis.title.x=element_blank())
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/onbox-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-3.png)<!-- -->
 
 ### High- vs. Low- Performers
 

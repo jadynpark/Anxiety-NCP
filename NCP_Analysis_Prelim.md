@@ -28,7 +28,7 @@ and anxious symptoms (potentially) moderate this relationship
 **3.1.** Alternatively, greater anxiety/impulsivity may only affect high
 NCP but not low NCP
 
-### This document displays EXTREMELY preliminary results from NCP data.
+### This document displays preliminary results from NCP data.
 
 ``` r
 #load libraries 
@@ -43,27 +43,42 @@ data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
 
 ``` r
 # Demographics
-demo.data <- data %>% dplyr::summarise(N = sum(!is.na(Subject.ID)),
+demo.high <- data %>% filter(Group == "high") %>%
+  dplyr::summarise(N = sum(!is.na(Subject.ID)),
             meanAge = mean(Age, na.rm = TRUE),
+            sdAge = sd(Age, na.rm = TRUE),
             female = sum(Sex == "F"),
             male = sum(Sex == "M"),
             eastAsian = sum(Race == "east asian"),
             white = sum(Race == "white"),
             interracial = sum(Race == "interracial"),
             black = sum(Race == "black"),
-            high = sum(Group == "high"),
-            low = sum(Group == "low"))
+  )
+demo.low <- data %>% filter(Group == "low") %>%
+  dplyr::summarise(N = sum(!is.na(Subject.ID)),
+            meanAge = mean(Age, na.rm = TRUE),
+            sdAge = sd(Age, na.rm = TRUE),
+            female = sum(Sex == "F"),
+            male = sum(Sex == "M"),
+            eastAsian = sum(Race == "east asian"),
+            white = sum(Race == "white"),
+            interracial = sum(Race == "interracial"),
+            black = sum(Race == "black"),
+  )
 
-t_demo.data <- as.data.frame(t(demo.data))
-names(t_demo.data) <- c("count or M")
-rownames(t_demo.data) <- c("N", "Mean Age", "Female", "Male", 
-                           "East Asian", "White", "Interracial", "Black", "High NCP", "Low NCP")
+demo.data <- rbind(demo.high, demo.low)
+demo.data <- as.data.frame(t(demo.data))
 
-knitr::kable(format(t_demo.data, digits = 5, drop0trailing = TRUE), caption = "Participant Demographics") %>%
+names(demo.data) <- c("High NCP", "Low NCP") # column names
+rownames(demo.data) <- c("N", "Mean", "SD", "Female", "Male", 
+                           "East Asian", "White", "Interracial", "Black") # row names
+
+knitr::kable(format(demo.data, digits = 4, drop0trailing = TRUE), caption = "Participant Demographics") %>%
   kable_styling(c("striped", full_width = F)) %>%
-  pack_rows("Sex", 3, 4) %>%
-  pack_rows("Race", 5, 8) %>%
-  pack_rows("NCP group", 9, 10)
+  pack_rows("Count", 1, 1) %>%
+  pack_rows("Age", 2, 3) %>%
+  pack_rows("Sex", 4, 5) %>%
+  pack_rows("Race", 6, 9) 
 ```
 
 <table class="table table-striped" style="margin-left: auto; margin-right: auto;">
@@ -84,7 +99,13 @@ Participant Demographics
 
 <th style="text-align:left;">
 
-count or M
+High NCP
+
+</th>
+
+<th style="text-align:left;">
+
+Low NCP
 
 </th>
 
@@ -94,9 +115,19 @@ count or M
 
 <tbody>
 
+<tr grouplength="1">
+
+<td colspan="3" style="border-bottom: 1px solid;">
+
+<strong>Count</strong>
+
+</td>
+
+</tr>
+
 <tr>
 
-<td style="text-align:left;">
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 
 N
 
@@ -104,23 +135,13 @@ N
 
 <td style="text-align:left;">
 
-66
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Mean Age
+29
 
 </td>
 
 <td style="text-align:left;">
 
-20.375
+37
 
 </td>
 
@@ -128,7 +149,61 @@ Mean Age
 
 <tr grouplength="2">
 
-<td colspan="2" style="border-bottom: 1px solid;">
+<td colspan="3" style="border-bottom: 1px solid;">
+
+<strong>Age</strong>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+Mean
+
+</td>
+
+<td style="text-align:left;">
+
+20.79
+
+</td>
+
+<td style="text-align:left;">
+
+20.06
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+
+SD
+
+</td>
+
+<td style="text-align:left;">
+
+1.95
+
+</td>
+
+<td style="text-align:left;">
+
+1.97
+
+</td>
+
+</tr>
+
+<tr grouplength="2">
+
+<td colspan="3" style="border-bottom: 1px solid;">
 
 <strong>Sex</strong>
 
@@ -146,7 +221,13 @@ Female
 
 <td style="text-align:left;">
 
-48
+22
+
+</td>
+
+<td style="text-align:left;">
+
+26
 
 </td>
 
@@ -162,7 +243,13 @@ Male
 
 <td style="text-align:left;">
 
-16
+6
+
+</td>
+
+<td style="text-align:left;">
+
+10
 
 </td>
 
@@ -170,7 +257,7 @@ Male
 
 <tr grouplength="4">
 
-<td colspan="2" style="border-bottom: 1px solid;">
+<td colspan="3" style="border-bottom: 1px solid;">
 
 <strong>Race</strong>
 
@@ -188,7 +275,13 @@ East Asian
 
 <td style="text-align:left;">
 
-10
+6
+
+</td>
+
+<td style="text-align:left;">
+
+4
 
 </td>
 
@@ -204,7 +297,13 @@ White
 
 <td style="text-align:left;">
 
-29
+7
+
+</td>
+
+<td style="text-align:left;">
+
+22
 
 </td>
 
@@ -220,7 +319,13 @@ Interracial
 
 <td style="text-align:left;">
 
-6
+3
+
+</td>
+
+<td style="text-align:left;">
+
+3
 
 </td>
 
@@ -236,49 +341,13 @@ Black
 
 <td style="text-align:left;">
 
-8
-
-</td>
-
-</tr>
-
-<tr grouplength="2">
-
-<td colspan="2" style="border-bottom: 1px solid;">
-
-<strong>NCP group</strong>
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-High NCP
+6
 
 </td>
 
 <td style="text-align:left;">
 
-29
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
-Low NCP
-
-</td>
-
-<td style="text-align:left;">
-
-37
+2
 
 </td>
 
@@ -625,92 +694,27 @@ ggplot(pcet.group1, aes(x = variable, y = value, fill = variable)) +
 
 ``` r
 # 1.1 Significance Test
-##Total Responses
+##### Total Responses #####
 total.high <- subset(pcet.melt, Group == "high" & variable == "PCET_NUM")
 total.low <- subset(pcet.melt, Group == "low" & variable == "PCET_NUM")
 #var.test(total.high$value, total.low$value) ##Fisher's F-test, p<0.05; heterogeneous sample
-t.test(total.high$value, total.low$value, var.equal = FALSE) #two-sample t test, p = 0.0117; significant difference in total number of responses between high vs. low NCP
-```
-
-    ## 
-    ##  Welch Two Sample t-test
-    ## 
-    ## data:  total.high$value and total.low$value
-    ## t = 2.6518, df = 37.18, p-value = 0.0117
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##   3.004263 22.450282
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  63.66667  50.93939
-
-``` r
-############# Effect Size #############
-high.m = pcet.group1[1,3]
-high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCET_NUM")
-high.sd =  pcet.group1[1,4]
-low.m = pcet.group1[4,3]
-low.sd = pcet.group1[4,4]
-low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCET_NUM")
-
-mean.diff = high.m - low.m
-sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
-cohensD = mean.diff/sd.pooled
-############# Cohen's D = 0.7498 #############
+total.t <- t.test(total.high$value, total.low$value, var.equal = FALSE) #two-sample t test, p = 0.0117; significant difference in total number of responses between high vs. low NCP
+total.d <- cohen.d(total.high$value, total.low$value, na.rm = T)
 
 
-##Correct Responses
+##### Correct Responses #####
 correct.high <- subset(pcet.melt, Group == "high" & variable == "PCETCR")
 correct.low <- subset(pcet.melt, Group == "low" & variable == "PCETCR")
 #var.test(correct.high$value, correct.low$value) #Fisher's F-test, p>0.05; both samples are homogeneous
-t.test(correct.high$value, correct.low$value, var.equal = TRUE) #two-sample t-test, p = 0.4882; no significant difference in total number of correct responses between low vs. high NCP
-```
+correct.t <- t.test(correct.high$value, correct.low$value, var.equal = TRUE) #two-sample t-test, p = 0.4882; no significant difference in total number of correct responses between low vs. high NCP
+correct.d <- cohen.d(correct.high$value, correct.low$value, na.rm = T)
 
-    ## 
-    ##  Two Sample t-test
-    ## 
-    ## data:  correct.high$value and correct.low$value
-    ## t = 0.69787, df = 55, p-value = 0.4882
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##  -2.041791  4.223610
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  35.33333  34.24242
-
-``` r
-###Incorrect Responses
+##### Incorrect Responses #####
 incorr.high <- subset(pcet.melt, Group == "high" & variable == "PCETER")
 incorr.low <- subset(pcet.melt, Group == "low" & variable == "PCETER")
 #var.test(incorr.high$value, incorr.low$value) #Fisher's F-test, p>0.05; both samples are homogeneous
-t.test(incorr.high$value, incorr.low$value, var.equal = TRUE) #two-sample t-test, p = 0.0069; significant difference in total number of incorrect responses between low vs. high NCP
-```
-
-    ## 
-    ##  Two Sample t-test
-    ## 
-    ## data:  incorr.high$value and incorr.low$value
-    ## t = 2.8049, df = 55, p-value = 0.006943
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##   3.322521 19.950207
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  28.33333  16.69697
-
-``` r
-############# Effect Size #############
-high.m = pcet.group1[3,3]
-high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCETER")
-high.sd =  pcet.group1[3,4]
-low.m = pcet.group1[6,3]
-low.sd = pcet.group1[6,4]
-low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCETER")
-
-mean.diff = high.m-low.m
-sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
-cohensD = mean.diff/sd.pooled
-############# Cohen's D = 0.7466 #############
+incorr.t <- t.test(incorr.high$value, incorr.low$value, var.equal = TRUE) #two-sample t-test, p = 0.0069; significant difference in total number of incorrect responses between low vs. high NCP
+incorr.d <- cohen.d(incorr.high$value, incorr.low$value, na.rm = T)
 
 
 # 2. RT of Correct and Incorrect Trials in High vs. Low NCP
@@ -741,97 +745,284 @@ ggplot(pcet.group2, aes(x = variable, y = value, fill = variable)) +
 
 ``` r
 # 2.1 Significance Test
-##Correct Responses
+##### Correct Responses #####
 correct.high.rt <- subset(pcet.melt, Group == "high" & variable == "PCETRTCR")
 correct.low.rt <- subset(pcet.melt, Group == "low" & variable == "PCETRTCR")
 #var.test(correct.high.rt$value, correct.low.rt$value) #Fisher's F-test, p<0.05; heterogeneous sample
-t.test(correct.high.rt$value, correct.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.1104; no significant difference in RT of correct responses between low vs. high NCP 
-```
+cor.rt.t <- t.test(correct.high.rt$value, correct.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.1104; no significant difference in RT of correct responses between low vs. high NCP 
+cor.rt.d <- cohen.d(correct.high.rt$value, correct.low.rt$value, na.rm = T)
 
-    ## 
-    ##  Welch Two Sample t-test
-    ## 
-    ## data:  correct.high.rt$value and correct.low.rt$value
-    ## t = 1.6436, df = 30.855, p-value = 0.1104
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##  -62.23829 578.47314
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  1834.708  1576.591
-
-``` r
-##Incorrect Responses
+##### Incorrect Responses #####
 incorr.high.rt <- subset(pcet.melt, Group == "high" & variable == "PCETRTER")
 incorr.low.rt <- subset(pcet.melt, Group == "low" & variable == "PCETRTER")
 #var.test(incorr.high.rt$value, incorr.low.rt$value) #Fisher's F-test, p<0.05; heterogeneous sample
-t.test(incorr.high.rt$value, incorr.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.0557; no significant difference in RT of incorrect responses between low vs. high NCP 
+incor.rt.t <- t.test(incorr.high.rt$value, incorr.low.rt$value, var.equal = FALSE) #Welch t-statistic, p = 0.0557; no significant difference in RT of incorrect responses between low vs. high NCP 
+incor.rt.d <- cohen.d(incorr.high.rt$value, incorr.low.rt$value, na.rm = T)
+
+# 3. Summary Table
+high.perf <- c(pcet.group1[2,3], pcet.group1[3,3], pcet.group1[1,3], pcet.group2[1,3], pcet.group2[2,3])
+low.perf <- c(pcet.group1[5,3], pcet.group1[4,3], pcet.group1[6,3], pcet.group2[3,3], pcet.group2[4,3])
+p.perf <- c(correct.t[["p.value"]], incorr.t[["p.value"]], total.t[["p.value"]], 
+            cor.rt.t[["p.value"]], incor.rt.t[["p.value"]])
+d.perf <- c(correct.d[["estimate"]], incorr.d[["estimate"]], total.d[["estimate"]], 
+            cor.rt.d[["estimate"]], incor.rt.d[["estimate"]])
+pcet.sum <- data.frame(high.perf, low.perf, p.perf, d.perf)
+pcet.sum <- as.data.frame(t(pcet.sum))
+rownames(pcet.sum) <- c("High NCP", "Low NCP", "p-value", "Cohen's D") 
+colnames(pcet.sum) <- c("Correct", "Incorrect", "Total", "Correct RT", "Incorrect RT")
+
+knitr::kable(format(pcet.sum, digits = 3, drop0trailing = TRUE, scientific = F), caption = "PCET Performance Summary") %>%
+  kable_styling(c("striped", "bordered", full_width = F))
 ```
 
-    ## 
-    ##  Welch Two Sample t-test
-    ## 
-    ## data:  incorr.high.rt$value and incorr.low.rt$value
-    ## t = 1.9803, df = 34.337, p-value = 0.05573
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##   -15.01516 1176.15910
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  2680.542  2099.970
+<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
 
-``` r
-############# Effect Size #############
-high.m = pcet.group2[2,3]
-high.n = sum(pcet.melt$Group=="high" & pcet.melt$variable=="PCETRTER")
-high.sd =  pcet.group2[2,4]
-low.m = pcet.group2[4,3]
-low.sd = pcet.group2[4,4]
-low.n = sum(pcet.melt$Group=="low" & pcet.melt$variable=="PCETRTER")
+<caption>
 
-mean.diff = high.m-low.m
-sd.pooled = sqrt(((high.n-1)*high.sd^2+(low.n-1)*low.sd^2)/(high.n+low.n-2))
-cohensD = mean.diff/sd.pooled
-############# Cohen's D = 0.5671 #############
-```
+PCET Performance Summary
+
+</caption>
+
+<thead>
+
+<tr>
+
+<th style="text-align:left;">
+
+</th>
+
+<th style="text-align:left;">
+
+Correct
+
+</th>
+
+<th style="text-align:left;">
+
+Incorrect
+
+</th>
+
+<th style="text-align:left;">
+
+Total
+
+</th>
+
+<th style="text-align:left;">
+
+Correct RT
+
+</th>
+
+<th style="text-align:left;">
+
+Incorrect RT
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td style="text-align:left;">
+
+High NCP
+
+</td>
+
+<td style="text-align:left;">
+
+35.333
+
+</td>
+
+<td style="text-align:left;">
+
+28.33333
+
+</td>
+
+<td style="text-align:left;">
+
+63.6667
+
+</td>
+
+<td style="text-align:left;">
+
+1834.708
+
+</td>
+
+<td style="text-align:left;">
+
+2680.5417
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Low NCP
+
+</td>
+
+<td style="text-align:left;">
+
+34.242
+
+</td>
+
+<td style="text-align:left;">
+
+50.93939
+
+</td>
+
+<td style="text-align:left;">
+
+16.697
+
+</td>
+
+<td style="text-align:left;">
+
+1576.591
+
+</td>
+
+<td style="text-align:left;">
+
+2099.9697
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+p-value
+
+</td>
+
+<td style="text-align:left;">
+
+0.488
+
+</td>
+
+<td style="text-align:left;">
+
+0.00694
+
+</td>
+
+<td style="text-align:left;">
+
+0.0117
+
+</td>
+
+<td style="text-align:left;">
+
+0.11
+
+</td>
+
+<td style="text-align:left;">
+
+0.0557
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Cohen’s D
+
+</td>
+
+<td style="text-align:left;">
+
+0.187
+
+</td>
+
+<td style="text-align:left;">
+
+0.75248
+
+</td>
+
+<td style="text-align:left;">
+
+0.758
+
+</td>
+
+<td style="text-align:left;">
+
+0.487
+
+</td>
+
+<td style="text-align:left;">
+
+0.575
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 ### Performance based on Accuracy, Efficiency, and Composite Score
 
 ``` r
 # 1. Accuracy (% Correct)
-pcet <- pcet %>% mutate(freq = PCETCR/PCET_NUM)
-pcet.freq <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric")
-pcet.freq <- pcet.freq %>% filter(variable == "freq")
+pcet <- pcet %>% mutate(acc = PCETCR/PCET_NUM)
+pcet.acc <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric")
+pcet.acc <- pcet.acc %>% filter(variable == "acc")
 
 # N, mean, and SD of high-NCP
-h.acc<- pcet.freq %>% filter(Group == "high") %>% summarise(n = sum(variable=="freq"),
+h.acc<- pcet.acc %>% filter(Group == "high") %>% summarise(n = sum(variable=="acc"),
                                                             mean = mean(as.numeric(value), na.rm = T),
                                                             sd = sd(as.numeric(value), na.rm = T)) 
 
 # N, mean, and SD of low-NCP
-l.acc <- pcet.freq %>% filter(Group == "low") %>% summarise(n = sum(variable=="freq"),
+l.acc <- pcet.acc %>% filter(Group == "low") %>% summarise(n = sum(variable=="acc"),
                                                            mean = mean(as.numeric(value), na.rm = T),
                                                            sd = sd(as.numeric(value), na.rm = T)) 
 
-high.freq <- data.frame(hf = rnorm(h.acc$n, h.acc$mean, h.acc$sd)) # normalized
-low.freq <- data.frame(lf = rnorm(l.acc$n, l.acc$mean, l.acc$sd))
-
 # Density Plot of Accuracy by Group
-ggplot() +
-  geom_density(data = high.freq, aes(x = hf), 
-               fill = "#145A32", color = "black", alpha = .5) + 
-  geom_density(data = low.freq, aes(x = lf), 
-               fill = "#F7DC6F", color = "black", alpha = .5) + 
-  theme_classic() +
-  ggtitle("Accuracy (% Correct) in high vs. low NCP") +
-  xlab("Accuracy (% Correct)") 
-```
-
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-1.png)<!-- -->
-
-``` r
+# high.acc <- data.frame(hf = rnorm(h.acc$n, h.acc$mean, h.acc$sd)) # normalized
+# low.acc <- data.frame(lf = rnorm(l.acc$n, l.acc$mean, l.acc$sd))
+#ggplot() +
+#  geom_density(data = high.acc, aes(x = hf), 
+#               fill = "#145A32", color = "black", alpha = .5) + 
+#  geom_density(data = low.acc, aes(x = lf), 
+#               fill = "#F7DC6F", color = "black", alpha = .5) + 
+#  theme_classic() +
+#  ggtitle("Accuracy (% Correct) in high vs. low NCP") +
+#  xlab("Accuracy (% Correct)") 
+  
 # Box Plot of Accuracy by Group
-ggplot(pcet.freq, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
+ggplot(pcet.acc, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
   geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
   theme_classic() +
@@ -839,29 +1030,17 @@ ggplot(pcet.freq, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TR
   labs(title = "Accuracy by Group", y = "Accuracy")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-2.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-1.png)<!-- -->
 
 ``` r
 # Significance Test of Accuracy by Group
-freq.high <- subset(pcet.freq, Group == "high")
-freq.low <- subset(pcet.freq, Group == "low")
-#var.test(as.numeric(freq.high$value), as.numeric(freq.low$value)) #Fisher's F-test, p>0.05; homogeneous sample
-t.test(as.numeric(freq.high$value), as.numeric(freq.low$value, var.equal = TRUE)) # p = 0.020
-```
+acc.high <- subset(pcet.acc, Group == "high")
+acc.low <- subset(pcet.acc, Group == "low")
+#var.test(as.numeric(acc.high$value), as.numeric(acc.low$value)) #Fisher's F-test, p>0.05; homogeneous sample
+acc.t <- t.test(as.numeric(acc.high$value), as.numeric(acc.low$value, var.equal = TRUE)) # p = 0.020
+acc.d <- cohen.d(acc.high$value, acc.low$value, na.rm = T)
 
-    ## 
-    ##  Welch Two Sample t-test
-    ## 
-    ## data:  as.numeric(freq.high$value) and as.numeric(freq.low$value, var.equal = TRUE)
-    ## t = -2.4117, df = 46.505, p-value = 0.01988
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##  -0.1987507 -0.0179414
-    ## sample estimates:
-    ## mean of x mean of y 
-    ## 0.5999165 0.7082625
 
-``` r
 # 2. Efficiency
 pcet.eff <- pcet.melt %>% filter(variable=="PCET_EFF")
 
@@ -874,23 +1053,18 @@ l.eff <- pcet.eff %>% filter(Group == "low") %>% summarise(n = sum(variable=="PC
                                                            mean = mean(as.numeric(value), na.rm = T),
                                                            sd = sd(as.numeric(value), na.rm = T)) 
 
-high.eff <- data.frame(he = rnorm(h.eff$n, h.eff$mean, h.eff$sd)) # normalized
-low.eff <- data.frame(le = rnorm(l.eff$n, l.eff$mean, l.eff$sd))
-
 # Density Plot of Efficiency By Group
-ggplot() +
-  geom_density(data = high.eff, aes(x = he),
-               fill = "#145A32", color = "black", alpha = .5) +
-  geom_density(data = low.eff, aes(x = le),
-               fill = "#F7DC6F", color = "black", alpha = .5) +
-  theme_classic() +
-  ggtitle("Efficiency in high vs. low NCP") +
-  xlab("Efficiency") 
-```
+# high.eff <- data.frame(he = rnorm(h.eff$n, h.eff$mean, h.eff$sd)) # normalized
+# low.eff <- data.frame(le = rnorm(l.eff$n, l.eff$mean, l.eff$sd))
+#ggplot() +
+#  geom_density(data = high.eff, aes(x = he),
+#               fill = "#145A32", color = "black", alpha = .5) +
+#  geom_density(data = low.eff, aes(x = le),
+#               fill = "#F7DC6F", color = "black", alpha = .5) +
+#  theme_classic() +
+#  ggtitle("Efficiency in high vs. low NCP") +
+#  xlab("Efficiency") 
 
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-3.png)<!-- -->
-
-``` r
 # Box Plot of Efficiency by Group 
 ggplot(pcet.eff, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
@@ -900,31 +1074,18 @@ ggplot(pcet.eff, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRU
   labs(title = "Efficiency by Group", y = "Efficiency")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-4.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-2.png)<!-- -->
 
 ``` r
 # Significance Test of Efficiency by Group 
 eff.high <- subset(pcet.eff, Group == "high")
 eff.low <- subset(pcet.eff, Group == "low")
 #var.test(eff.high$value, eff.low$value) #Fisher's F-test, p>0.05; homogeneous sample
-t.test(eff.high$value, eff.low$value, var.equal = TRUE) #p=0.0123
-```
+eff.t <- t.test(eff.high$value, eff.low$value, var.equal = TRUE) #p=0.0123
+eff.d <- cohen.d(eff.high$value, eff.low$value, na.rm = T)
 
-    ## 
-    ##  Two Sample t-test
-    ## 
-    ## data:  eff.high$value and eff.low$value
-    ## t = -2.5859, df = 55, p-value = 0.01239
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##  -0.11453122 -0.01451954
-    ## sample estimates:
-    ## mean of x mean of y 
-    ## 0.2139292 0.2784545
-
-``` r
 # 3. Composite score
-pcet <- pcet %>% mutate(score = PCET_CAT * freq)
+pcet <- pcet %>% mutate(score = PCET_CAT * acc)
 pcet.score <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name="metric") 
 pcet.score <- pcet.score %>% filter(variable == "score") 
 
@@ -938,23 +1099,18 @@ l.sc <- pcet.score %>% filter(Group == "low") %>% summarise(n = sum(variable=="s
                                                            mean = mean(as.numeric(value), na.rm = T),
                                                            sd = sd(as.numeric(value), na.rm = T)) 
 
-high.score <- data.frame(hs = rnorm(h.sc$n, h.sc$mean, h.sc$sd)) # normalized
-low.score <- data.frame(ls = rnorm(l.sc$n, l.sc$mean, l.sc$sd))
-
 # Density Plot of Composite Score by Group
-ggplot() +
-  geom_density(data = high.score, aes(x = hs),
-               fill = "#145A32", color = "black", alpha = .5) +
-  geom_density(data = low.score, aes(x = ls),
-               fill = "#F7DC6F", color = "black", alpha = .5) +
-  theme_classic() +
-  ggtitle("Composite Score in high vs. low NCP") +
-  xlab("Score") 
-```
+# high.score <- data.frame(hs = rnorm(h.sc$n, h.sc$mean, h.sc$sd)) # normalized
+# low.score <- data.frame(ls = rnorm(l.sc$n, l.sc$mean, l.sc$sd))
+#ggplot() +
+#  geom_density(data = high.score, aes(x = hs),
+#               fill = "#145A32", color = "black", alpha = .5) +
+#  geom_density(data = low.score, aes(x = ls),
+#               fill = "#F7DC6F", color = "black", alpha = .5) +
+#  theme_classic() +
+#  ggtitle("Composite Score in high vs. low NCP") +
+#  xlab("Score") 
 
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-5.png)<!-- -->
-
-``` r
 # Box Plot of Composite Score by Group
 ggplot(pcet.score, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = TRUE) +
   geom_boxplot(position = position_dodge()) +
@@ -964,54 +1120,235 @@ ggplot(pcet.score, aes(x=variable, y=as.numeric(value), fill = Group), na.rm = T
   labs(title = "Composite Score by Group", y = "Score")
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/perf-6.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/perf-3.png)<!-- -->
 
 ``` r
 # Significance Test of Composite Score by Group
 score.high <- subset(pcet.score, Group == "high")
 score.low <- subset(pcet.score, Group == "low")
 #var.test(as.numeric(score.high$value), as.numeric(score.low$value)) #homogeneous
-t.test(as.numeric(score.high$value), as.numeric(score.low$value), var.equal=T) #p=0.014
+score.t <- t.test(as.numeric(score.high$value), as.numeric(score.low$value), var.equal=T) #p=0.014
+score.d <- cohen.d(score.high$value, score.low$value, na.rm = T)
+
+# Summary Table
+h.acc.sum = paste(round(h.acc['mean'], 2), "(" , round(h.acc['sd'], 2), ")", sep = "")
+h.eff.sum = paste(round(h.eff['mean'], 2), "(" , round(h.eff['sd'], 2), ")", sep = "")
+h.sc.sum = paste(round(h.sc['mean'], 2), "(" , round(h.sc['sd'], 2), ")", sep = "")
+l.acc.sum = paste(round(l.acc['mean'], 2), "(" , round(l.acc['sd'], 2), ")", sep = "")
+l.eff.sum = paste(round(l.eff['mean'], 2), "(" , round(l.eff['sd'], 2), ")", sep = "")
+l.sc.sum = paste(round(l.sc['mean'], 2), "(" , round(l.sc['sd'], 2), ")", sep = "")
+
+high.summary <- cbind(h.acc.sum, h.eff.sum, h.sc.sum)
+rownames(high.summary) <- "High NCP"
+pval <- round(cbind(acc.t[["p.value"]], eff.t[["p.value"]], score.t[["p.value"]]),3)
+rownames(pval) <- "p-value"
+low.summary <- cbind(l.acc.sum, l.eff.sum, l.sc.sum)
+rownames(low.summary) <- "Low NCP"
+cohensd <- abs(round(cbind(acc.d[["estimate"]], eff.d[["estimate"]], score.d[["estimate"]]), 3))
+rownames(cohensd) <- "Cohen's D"
+performance.table <- data.frame(rbind(high.summary, low.summary, pval, cohensd))
+colnames(performance.table) <- c("Accuracy", "Efficiency", "Score")
+
+knitr::kable(performance.table,caption = "Mean (SD) of Accuracy, Efficiency, and Composite Score Summary") %>%
+  kable_styling(c("striped", "bordered", full_width = F)) 
 ```
 
-    ## 
-    ##  Two Sample t-test
-    ## 
-    ## data:  as.numeric(score.high$value) and as.numeric(score.low$value)
-    ## t = -2.5588, df = 55, p-value = 0.01328
-    ## alternative hypothesis: true difference in means is not equal to 0
-    ## 95 percent confidence interval:
-    ##  -0.82013849 -0.09971838
-    ## sample estimates:
-    ## mean of x mean of y 
-    ##  1.581096  2.041024
+<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
+
+<caption>
+
+Mean (SD) of Accuracy, Efficiency, and Composite Score Summary
+
+</caption>
+
+<thead>
+
+<tr>
+
+<th style="text-align:left;">
+
+</th>
+
+<th style="text-align:left;">
+
+Accuracy
+
+</th>
+
+<th style="text-align:left;">
+
+Efficiency
+
+</th>
+
+<th style="text-align:left;">
+
+Score
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td style="text-align:left;">
+
+High NCP
+
+</td>
+
+<td style="text-align:left;">
+
+0.6(0.17)
+
+</td>
+
+<td style="text-align:left;">
+
+0.21(0.1)
+
+</td>
+
+<td style="text-align:left;">
+
+1.58(0.75)
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Low NCP
+
+</td>
+
+<td style="text-align:left;">
+
+0.71(0.16)
+
+</td>
+
+<td style="text-align:left;">
+
+0.28(0.08)
+
+</td>
+
+<td style="text-align:left;">
+
+2.04(0.61)
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+p-value
+
+</td>
+
+<td style="text-align:left;">
+
+0.02
+
+</td>
+
+<td style="text-align:left;">
+
+0.012
+
+</td>
+
+<td style="text-align:left;">
+
+0.013
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
+Cohen’s D
+
+</td>
+
+<td style="text-align:left;">
+
+0.658
+
+</td>
+
+<td style="text-align:left;">
+
+0.694
+
+</td>
+
+<td style="text-align:left;">
+
+0.686
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 ### PCET Performance by Block
 
 ``` r
-pcet.melt <- pcet.melt %>% select(Group, variable, value)
+pcet <- pcet %>% filter(PCET_CAT == 3) # excluding incomplete subjects (ie category achieved <3)
+pcet.trials <- melt(pcet, id.vars = c("Group", "Subject.ID"), variable_name = "metric") # individual trials data
 blocks <- c("CAT1_TR", "CAT2_TR", "CAT3_TR")
-pcet.block <- pcet.melt %>% filter(variable %in% blocks) %>%
-  dplyr::group_by(Group, variable) %>%
-  dplyr::summarise(Trials = mean(value, na.rm = T))
+pcet.trials <- pcet.trials %>% filter(variable %in% blocks) # filter out irrelevant variables
+pcet.trials$value <- as.numeric(pcet.trials$value, na.rm = T)
+pcet.trials$Subject.ID <- as.factor(pcet.trials$Subject.ID) 
 
-#Number of Trials by Block
-ggplot(pcet.block, aes(x = variable, y = Trials, group = Group)) +
-  geom_line(aes(linetype = Group, color = Group)) +
-  geom_point() +
-  scale_color_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  theme_classic()
+pcet.blocks <- pcet.trials %>% dplyr::group_by(Group, variable) %>%
+  dplyr::summarise(value = mean(value, na.rm = T)) # group means data
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/byblock-1.png)<!-- -->
+#### Number of trials to achieve category as a proxy for rule learning. Individuals must choose the correct object on 10 consecutive trials to “achieve category”. Once it is achieved, new rule is in effect
+
+``` r
+# Individual and Group Trajectory
+ggplot(pcet.trials, aes(x = variable, y = value, color = Group)) +
+  geom_line(aes(group = Subject.ID), alpha = .3) +
+  geom_line(data = pcet.blocks, aes(group = Group), alpha = .9, size = 2) +
+  theme_classic() +
+  scale_color_manual(values = wes_palette(n=2, name="Chevalier1")) +
+  labs(
+    title = "Individual and Group Trajectories in Rule Learning",
+    x = NULL,
+    y = "# of Trials",
+    color = NULL
+  )
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/trajectory-1.png)<!-- -->
 
 ### PCET & Clinical Traits
 
 ``` r
-data <- data %>% mutate(freq = as.numeric(PCETCR/PCET_NUM), score = as.numeric(PCET_CAT * freq))
+data <- data %>% mutate(acc = as.numeric(PCETCR/PCET_NUM), score = as.numeric(PCET_CAT * acc))
 
 # Group x Accuracy Correlation 
-ggplot(data, aes(x = Pos_Freq, y = freq, col = Group)) + geom_point() +
+ggplot(data, aes(x = Pos_Freq, y = acc, col = Group)) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "Correlation between CAPE positive score and Accuracy by Group",
@@ -1050,7 +1387,7 @@ ggplot(data, aes(x = Pos_Freq, y = score, col = Group)) + geom_point() +
 
 ``` r
 # Anxiety x Accuracy Correlation by Group
-ggplot(data, aes(x = BAI.sum, y = freq, col = Group), na.rm = T) + geom_point() +
+ggplot(data, aes(x = BAI.sum, y = acc, col = Group), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "Correlation between BAI score and Accuracy", x = "BAI score", y = "Accuracy") +
@@ -1064,13 +1401,13 @@ ggplot(data, aes(x = BAI.sum, y = freq, col = Group), na.rm = T) + geom_point() 
 # Does Group x Anxiety Interaction predict Accuracy?
   # X = Anxiety Score, # D = Group (1 = high NCP, 0 = low NCP) # Y = Accuracy
   # Yi = B0 + B1Xi + B2Xi + ui
-
-summary(lm(data = data, freq ~ BAI.sum*Group))
+interac <- data %>% select(acc, BAI.sum, Group)
+summary(lm(data = interac, acc ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = freq ~ BAI.sum * Group, data = data)
+    ## lm(formula = acc ~ BAI.sum * Group, data = interac)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
@@ -1091,6 +1428,10 @@ summary(lm(data = data, freq ~ BAI.sum*Group))
     ## F-statistic: 4.216 on 3 and 44 DF,  p-value: 0.0105
 
 ``` r
+# anxiety score significantly predicted performance
+# NCP status even more significantly predicted performance
+# interaction signiicantly predicted performacne
+
 # Anxiety x Efficiency Correlation by Group
 ggplot(data, aes(x = BAI.sum, y = PCET_EFF, col = Group), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
@@ -1104,12 +1445,13 @@ ggplot(data, aes(x = BAI.sum, y = PCET_EFF, col = Group), na.rm = T) + geom_poin
 
 ``` r
 # Does Group x Anxiety Interaction predict Efficiency?
-summary(lm(data = data, PCET_EFF ~ BAI.sum*Group))
+interac1 <- data %>% select(PCET_EFF, BAI.sum, Group)
+summary(lm(data = interac1, PCET_EFF ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = PCET_EFF ~ BAI.sum * Group, data = data)
+    ## lm(formula = PCET_EFF ~ BAI.sum * Group, data = interac1)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
@@ -1143,12 +1485,13 @@ ggplot(data, aes(x = BAI.sum, y = score, col = Group), na.rm = T) + geom_point()
 
 ``` r
 # Does Group x Anxiety Interaction predict Composite Score?
-summary(lm(data = data, score ~ BAI.sum*Group))
+interac2 <- data %>% select(score, BAI.sum, Group)
+summary(lm(data = interac2, score ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = score ~ BAI.sum * Group, data = data)
+    ## lm(formula = score ~ BAI.sum * Group, data = interac2)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
@@ -1168,6 +1511,86 @@ summary(lm(data = data, score ~ BAI.sum*Group))
     ## Multiple R-squared:  0.228,  Adjusted R-squared:  0.1753 
     ## F-statistic: 4.331 on 3 and 44 DF,  p-value: 0.009264
 
+### PCET & Clinical Traits on Box Plot
+
+``` r
+# Mean Anxiety Scores for Each Group
+anx.means <- data %>% select(Group, BAI.sum) %>%
+  dplyr::group_by(Group) %>%
+  dplyr::summarise(mean.anx = mean(BAI.sum, na.rm = T), sd.anx = sd(BAI.sum, na.rm = T))
+
+# BAI score by Group (above or below average)
+anx.data <- data %>% select(Subject.ID, Group, BAI.sum)
+
+anx.data$anxiety <- ifelse(anx.data$Group == "high" & anx.data$BAI.sum > 17.9, "above",
+ ifelse(anx.data$Group == "low" & anx.data$BAI.sum > 9.77, "above",
+  ifelse(anx.data$Group == "high" & anx.data$BAI.sum < 17.9, "below", "below"))) # 'above' or 'below' mean anxiety score of each group, mean value is hard-coded
+
+##### 1. Accuracy #####
+pcet.acc <- merge(pcet.acc, anx.data, by = "Subject.ID")
+
+pcet.acc %>%
+  filter(!is.na(anxiety)) %>%
+  mutate(Group.x = ifelse(Group.x == "high", "High NCP", "Low NCP"),
+         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group.x, anxiety),
+                                          '\\.', '&'),
+                              ordered=TRUE)) %>%
+  ggplot(aes(x=Interaction, y=value)) +
+  geom_boxplot(aes(fill=Group.x)) +
+  geom_point(aes(shape=anxiety), size = 2) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(title="Integrative Effects of Anxiety and Psychosis on Accuracy", y="Accuracy") +
+  theme_classic(base_size=10) +
+  theme(axis.title.x=element_blank())
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/onbox-1.png)<!-- -->
+
+``` r
+##### 2. Efficiency #####
+pcet.eff <- merge(pcet.eff, anx.data, by = "Subject.ID")
+
+pcet.eff %>%
+  filter(!is.na(anxiety)) %>%
+  mutate(Group.x = ifelse(Group.x == "high", "High NCP", "Low NCP"),
+         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group.x, anxiety),
+                                          '\\.', '&'),
+                              ordered=TRUE)) %>%
+  ggplot(aes(x=Interaction, y=value)) +
+  geom_boxplot(aes(fill=Group.x)) +
+  geom_point(aes(shape=anxiety), size = 2) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(title="Integrative Effects of Anxiety and Psychosis on Efficiency", y="Efficiency") +
+  theme_classic(base_size=10) +
+  theme(axis.title.x=element_blank())
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/onbox-2.png)<!-- -->
+
+``` r
+##### 3. Score #####
+pcet.score <- merge(pcet.score, anx.data, by = "Subject.ID")
+
+pcet.score %>%
+  filter(!is.na(anxiety)) %>%
+  mutate(Group.x = ifelse(Group.x == "high", "High NCP", "Low NCP"),
+         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group.x, anxiety),
+                                          '\\.', '&'),
+                              ordered=TRUE)) %>%
+  ggplot(aes(x=Interaction, y=value)) +
+  geom_boxplot(aes(fill=Group.x)) +
+  geom_point(aes(shape=anxiety), size = 2) +
+  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(title="Integrative Effects of Anxiety and Psychosis on Score", y="PCET Score") +
+  theme_classic(base_size=10) +
+  theme(axis.title.x=element_blank())
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/onbox-3.png)<!-- -->
+
 ### High- vs. Low- Performers
 
 Two clusters, especially among the high-NCP group, in Efficiency and
@@ -1176,14 +1599,14 @@ Anxiety scores.
 
 ``` r
 # 1. Accuracy
-accuracy <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$freq)
-accuracy$performance <- ifelse(accuracy$data.Group == "high" & accuracy$data.freq > h.acc$mean, "Above", 
-                             ifelse(accuracy$data.Group == "low" & accuracy$data.freq > l.acc$mean, "Above",
-                                    ifelse(accuracy$data.Group == "high" & accuracy$data.freq < h.acc$mean, "Below", "Below")))
+accuracy <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$acc)
+accuracy$performance <- ifelse(accuracy$data.Group == "high" & accuracy$data.acc > h.acc$mean, "Above", 
+                             ifelse(accuracy$data.Group == "low" & accuracy$data.acc > l.acc$mean, "Above",
+                                    ifelse(accuracy$data.Group == "high" & accuracy$data.acc < h.acc$mean, "Below", "Below")))
 
 # Above and Below Average Performers among High-NCP Group
 acc_high <- accuracy %>% filter(data.Group == "high") %>% drop_na()
-ggplot(acc_high, aes(x = data.BAI.sum, y = data.freq, col = performance), na.rm = T) + geom_point() +
+ggplot(acc_high, aes(x = data.BAI.sum, y = data.acc, col = performance), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "BAI-Accuracy Correlation of Above vs. Below Average Performers among High-NCP Group", 
@@ -1197,7 +1620,7 @@ ggplot(acc_high, aes(x = data.BAI.sum, y = data.freq, col = performance), na.rm 
 ``` r
 # Above and Below Average Performers among Low-NCP Group
 acc_low <- accuracy %>% filter(data.Group == "low") %>% drop_na()
-ggplot(acc_low, aes(x = data.BAI.sum, y = data.freq, col = performance), na.rm = T) + geom_point() +
+ggplot(acc_low, aes(x = data.BAI.sum, y = data.acc, col = performance), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "BAI-Accuracy Correlation of Above vs. Below Average Performers among Low-NCP Group", 
@@ -1280,13 +1703,13 @@ ggplot(sc_low, aes(x = data.BAI.sum, y = data.score, col = performance), na.rm =
 # 4. RT -- below average is faster
 # 4.1 Correct Responses RT 
 RT <- data.frame(data$Subject.ID, data$Group, data$BAI.sum, data$PCETRTER)
-RT$performance <- ifelse(RT$data.Group == "high" & RT$data.PCETRTER > mean(incorr.high.rt$value, na.rm = T), "Above", 
+RT$speed <- ifelse(RT$data.Group == "high" & RT$data.PCETRTER > mean(incorr.high.rt$value, na.rm = T), "Above", 
                     ifelse(RT$data.Group == "low" & RT$data.PCETRTER > mean(incorr.low.rt$value, na.rm = T), "Above",
                       ifelse(RT$data.Group == "high" & RT$data.PCETRTER < mean(incorr.high.rt$value, na.rm = T), "Below", "Below")))
 
 # Above and Below Average Performers among High-NCP Group
 RT_high <- RT %>% filter(data.Group == "high") %>% drop_na()
-ggplot(RT_high, aes(x = data.BAI.sum, y = data.PCETRTER, col = performance), na.rm = T) + geom_point() +
+ggplot(RT_high, aes(x = data.BAI.sum, y = data.PCETRTER, col = speed), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "BAI-Incorrect RT Correlation of Above vs. Below Average Performers among High-NCP Group", 
@@ -1300,7 +1723,7 @@ ggplot(RT_high, aes(x = data.BAI.sum, y = data.PCETRTER, col = performance), na.
 ``` r
 # Above and Below Average Performers among Low-NCP Group
 RT_low <- RT %>% filter(data.Group == "low") %>% drop_na()
-ggplot(RT_low, aes(x = data.BAI.sum, y = data.PCETRTER, col = performance), na.rm = T) + geom_point() +
+ggplot(RT_low, aes(x = data.BAI.sum, y = data.PCETRTER, col = speed), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "BAI-Incorrect RT Correlation of Above vs. Below Average Performers among Low-NCP Group", 

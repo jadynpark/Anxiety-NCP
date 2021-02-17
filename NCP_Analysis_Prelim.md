@@ -12,19 +12,18 @@ to the difference in group performance?
 learning tasks?
 
 **Research Aims:**  
-**Aim 1.** To test group differences in cognitive performance between
-Low vs. High NCP  
-**Aim 2.** To test if group performance is related to anxious/impulsive
-symptoms  
-**Aim 3.** To test if anxiety is correlated with perseveration errors in
-implicit learning tasks
+**Aim 1.** To test group differences in cognitive performance (accuracy,
+efficiency) in Low vs. High NCP  
+**Aim 2.** To test if group performance is related to clinically
+relevant traits (e.g., anxiety)  
+**Aim 3.** To test if relevant traits are correlated with perseveration
+errors in a rule-learning task
 
 **Hypotheses:**  
 **1.** Low NCPs perform better than high NCPs  
-**2.** Greater the BAI (anxiety) scores, worse the performance in
-tasks  
-**3.** Low NCPs perform better (i.e., perseverate less) than high NCPs
-and anxious symptoms (potentially) moderate this relationship  
+**2.** Greater the BAI (anxiety) scores, worse the performance  
+**3.** Low NCPs perseverate less than high NCPs and anxiety symptoms are
+correlated with this relationship  
 **3.1.** Alternatively, greater anxiety may only affect high NCP but not
 low NCP
 
@@ -33,7 +32,7 @@ low NCP
 ``` r
 #load libraries 
 rm(list = ls())
-library(knitr); library(kableExtra); library(reshape2); library(tidyverse); library(dplyr); library(effsize); library(tables); library(ggplot2); library(ggpubr); library(RColorBrewer); library(ez); source("~/Desktop/Anxiety NCP/summarySEwithin2.R"); library(wesanderson)
+library(knitr); library(kableExtra); library(reshape2); library(tidyverse); library(dplyr); library(effsize);library(rstatix); library(tables); library(ggplot2); library(ggpubr); library(RColorBrewer); library(ez); source("~/Desktop/Anxiety NCP/summarySEwithin2.R"); library(wesanderson)
 
 #import data - demographics, self report, and PCET
 data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
@@ -627,13 +626,19 @@ PCET\_CAT = number of categories achieved (shape, line thickness,
 size)  
 CAT(1, 2, 3)\_TR = correct + incorrect number of trials to achieve 1st,
 2nd, 3rd category  
-PER\_ER = measure of perseverative error PCET\_EFF = efficiency  
-PCET\_ACC = accuracy ((correct trials/total trials)\*category achieved)
+PER\_ER = measure of perseverative error  
+PER\_RES = measure perseverative responses (difference between ER and
+RES is unclear…)  
+PCET\_EFF = efficiency (PCET Efficiency = PCET\_ACC/log(PCET\_RTCR))  
+PCET\_ACC = accuracy (PCET Accuracy = PCET\_CAT \* PCET\_CR/(PCET\_CR
++PCET\_ER))  
+PCET\_ACC2 = PCET Accuracy2 = (PCET\_CAT + 1) \* PCET\_CR/(PCET\_CR
++PCET\_ER) (if they have not learned a single rule)
 
 ### Performance based on Accuracy, Efficiency, and Perseveration Error
 
 ``` r
-pcet <- data %>% select(Subject.ID, Group, PCETER, PCETRTCR, PCETRTER, PCET_CAT, CAT1_TR, CAT2_TR, CAT3_TR, PCET_EFF, PER_ER, PCET_ACC)
+pcet <- data %>% select(Subject.ID, Group, PCETER, PCETRTCR, PCETRTER, PCET_CAT, CAT1_TR, CAT2_TR, CAT3_TR, PCET_EFF, PER_RES, PCET_ACC2)
 high <- pcet %>% filter(Group == "high") #subset of high-NCP
 low <- pcet %>% filter(Group == "low") #subset of low-NCP
 
@@ -653,21 +658,31 @@ cat.d <- cohen.d(high$PCET_CAT, low$PCET_CAT, na.rm=T)
 # 2. Accuracy (PCET_ACC)
 # N, mean, and SD of high-NCP
 h.acc<- pcet %>% filter(Group == "high") %>% summarise(n = sum(Group=="high" & !is.na(PCET_CAT)),
-                                                       mean = mean(PCET_ACC, na.rm = T),
-                                                       sd = sd(PCET_ACC, na.rm = T)) 
+                                                       mean = mean(PCET_ACC2, na.rm = T),
+                                                       sd = sd(PCET_ACC2, na.rm = T)) 
 
 # N, mean, and SD of low-NCP
 l.acc <- pcet %>% filter(Group == "low") %>% summarise(n = sum(Group=="low" & !is.na(PCET_CAT)),
-                                                           mean = mean(PCET_ACC, na.rm = T),
-                                                           sd = sd(PCET_ACC, na.rm = T)) 
+                                                           mean = mean(PCET_ACC2, na.rm = T),
+                                                           sd = sd(PCET_ACC2, na.rm = T)) 
   
 # Box Plot of Accuracy by Group
-ggplot(pcet, aes(x=Group, y=PCET_ACC, fill = Group), na.rm = TRUE) +
-  geom_boxplot(position = position_dodge()) +
-  geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
+acc <- pcet %>% dplyr::group_by(Group) %>% dplyr::summarise(ACC = mean(PCET_ACC2, na.rm = T))
+acc.aov <- pcet %>% anova_test(PCET_ACC2~Group)
+acc.pwc <- pcet %>% pairwise_t_test(PCET_ACC2~Group, p.adjust.method = "bonferroni")
+acc.pwc <- acc.pwc %>% add_xy_position(x="group")
+
+ggplot(pcet, aes(Group, PCET_ACC2)) +
+  geom_boxplot(aes(group = Group, fill = Group), position = position_dodge()) +
+  geom_dotplot(aes(fill=Group), binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) + 
+  stat_pvalue_manual(acc.pwc, hide.ns = TRUE, label = "p.adj.signif") +
   theme_classic() +
-  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title = "Accuracy by Group", y = "Accuracy")
+ scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(
+    subtitle = get_test_label(acc.aov, detailed = TRUE),
+    caption = get_pwc_label(acc.pwc),
+    y = "Accuracy"
+    )
 ```
 
 ![](NCP_Analysis_Prelim_files/figure-gfm/pcet-1.png)<!-- -->
@@ -675,8 +690,8 @@ ggplot(pcet, aes(x=Group, y=PCET_ACC, fill = Group), na.rm = TRUE) +
 ``` r
 # Significance Test of Accuracy by Group
 #var.test(high$PCET_ACC, low$PCET_ACC) #Fisher's F-test, p>0.05; homogeneous sample
-acc.t <- t.test(high$PCET_ACC, low$PCET_ACC, var.equal = TRUE) #p<.05
-acc.d <- cohen.d(high$PCET_ACC, low$PCET_ACC, na.rm = T)
+acc.t <- t.test(high$PCET_ACC2, low$PCET_ACC2, var.equal = TRUE) #p<.05
+acc.d <- cohen.d(high$PCET_ACC2, low$PCET_ACC2, na.rm = T)
 
 # 3. Efficiency (PCET_EFF)
 # N, mean, and SD of high-NCP
@@ -689,12 +704,22 @@ l.eff <- pcet %>% filter(Group == "low") %>% summarise(n = sum(Group=="low" & !i
                                                            sd = sd(PCET_EFF, na.rm = T)) 
 
 # Box Plot of Efficiency by Group 
-ggplot(pcet, aes(x=Group, y=PCET_EFF, fill = Group), na.rm = TRUE) +
-  geom_boxplot(position = position_dodge()) +
-  geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
+eff <- pcet %>% dplyr::group_by(Group) %>% dplyr::summarise(EFF = mean(PCET_EFF, na.rm = T))
+eff.aov <- pcet %>% anova_test(PCET_EFF~Group)
+eff.pwc <- pcet %>% pairwise_t_test(PCET_EFF~Group, p.adjust.method = "bonferroni")
+eff.pwc <- eff.pwc %>% add_xy_position(x="group")
+
+ggplot(pcet, aes(Group, PCET_EFF)) +
+  geom_boxplot(aes(group = Group, fill = Group), position = position_dodge()) +
+  geom_dotplot(aes(fill=Group), binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) + 
+  stat_pvalue_manual(eff.pwc, hide.ns = TRUE, label = "p.adj.signif") +
   theme_classic() +
-  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title = "Efficiency by Group", y = "Efficiency")
+ scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(
+    subtitle = get_test_label(eff.aov, detailed = TRUE),
+    caption = get_pwc_label(eff.pwc),
+    y = "Efficiency"
+    )
 ```
 
 ![](NCP_Analysis_Prelim_files/figure-gfm/pcet-2.png)<!-- -->
@@ -705,23 +730,33 @@ ggplot(pcet, aes(x=Group, y=PCET_EFF, fill = Group), na.rm = TRUE) +
 eff.t <- t.test(high$PCET_EFF, low$PCET_EFF, var.equal = TRUE) 
 eff.d <- cohen.d(high$PCET_EFF, low$PCET_EFF, na.rm = T)
 
-# 4. Perseveration Error Rate (PER_ER)
+# 4. Perseveration Error Rate (PER_RES)
 # N, mean, and SD of high-NCP
 h.err <- pcet %>% filter(Group == "high") %>% summarise(n = sum(Group=="high" & !is.na(PCET_CAT)),
-                                                            mean = mean(PER_ER, na.rm = T),
-                                                            sd = sd(PER_ER, na.rm = T))
+                                                            mean = mean(PER_RES, na.rm = T),
+                                                            sd = sd(PER_RES, na.rm = T))
 # N, mean, and SD of low-NCP
 l.err <- pcet %>% filter(Group == "low") %>% summarise(n = sum(Group=="low" & !is.na(PCET_CAT)),
-                                                           mean = mean(PER_ER, na.rm = T),
-                                                           sd = sd(PER_ER, na.rm = T)) 
+                                                           mean = mean(PER_RES, na.rm = T),
+                                                           sd = sd(PER_RES, na.rm = T)) 
 
 # Box Plot of Perseveration Error by Group
-ggplot(pcet, aes(x=Group, y=PER_ER, fill = Group), na.rm = TRUE) +
-  geom_boxplot(position = position_dodge()) +
-  geom_dotplot(binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) +
+err <- pcet %>% dplyr::group_by(Group) %>% dplyr::summarise(ERR = mean(PER_RES, na.rm = T))
+err.aov <- pcet %>% anova_test(PER_RES~Group)
+err.pwc <- pcet %>% pairwise_t_test(PER_RES~Group, p.adjust.method = "bonferroni")
+err.pwc <- err.pwc %>% add_xy_position(x="group")
+
+ggplot(pcet, aes(Group, PER_RES)) +
+  geom_boxplot(aes(group = Group, fill = Group), position = position_dodge()) +
+  geom_dotplot(aes(fill=Group), binaxis='y', stackdir='center', dotsize=.5, position = position_dodge()) + 
+  stat_pvalue_manual(err.pwc, hide.ns = TRUE, label = "p.adj.signif") +
   theme_classic() +
-  scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title = "Perseveration Errors by Group", y = "# Error Trials")
+ scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
+  labs(
+    subtitle = get_test_label(err.aov, detailed = TRUE),
+    caption = get_pwc_label(err.pwc),
+    y = "# Error Trials"
+    )
 ```
 
 ![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
@@ -729,8 +764,8 @@ ggplot(pcet, aes(x=Group, y=PER_ER, fill = Group), na.rm = TRUE) +
 ``` r
 # Significance Test of Perseveration Error by Group
 #var.test(as.numeric(score.high$value), as.numeric(score.low$value)) #homogeneous
-error.t <- t.test(high$PER_ER, low$PER_ER, var.equal=T) #p=0.014
-error.d <- cohen.d(high$PER_ER, low$PER_ER, na.rm = T)
+error.t <- t.test(high$PER_RES, low$PER_RES, var.equal=T) #p=0.014
+error.d <- cohen.d(high$PER_RES, low$PER_RES, na.rm = T)
 
 # Summary Table
 h.cat = paste(round(h.cat['mean'], 2), "(", round(h.cat['sd'], 2), ")", sep = "")
@@ -816,7 +851,7 @@ High NCP
 
 <td style="text-align:left;">
 
-1.58(0.75)
+2.18(0.92)
 
 </td>
 
@@ -828,7 +863,7 @@ High NCP
 
 <td style="text-align:left;">
 
-15.33(9.63)
+16.92(10.97)
 
 </td>
 
@@ -850,7 +885,7 @@ Low NCP
 
 <td style="text-align:left;">
 
-2.04(0.61)
+2.75(0.76)
 
 </td>
 
@@ -862,7 +897,7 @@ Low NCP
 
 <td style="text-align:left;">
 
-9.09(6.49)
+10.03(7.2)
 
 </td>
 
@@ -884,7 +919,7 @@ p-value
 
 <td style="text-align:left;">
 
-0.013
+0.014
 
 </td>
 
@@ -896,7 +931,7 @@ p-value
 
 <td style="text-align:left;">
 
-0.005
+0.006
 
 </td>
 
@@ -918,7 +953,7 @@ Cohen’s D
 
 <td style="text-align:left;">
 
-0.686
+0.684
 
 </td>
 
@@ -930,7 +965,7 @@ Cohen’s D
 
 <td style="text-align:left;">
 
-0.785
+0.768
 
 </td>
 
@@ -944,46 +979,35 @@ Cohen’s D
 
 ``` r
 # Group x Accuracy Correlation 
-ggplot(data, aes(x = Pos_Freq, y = PCET_ACC, col = Group)) + geom_point() +
-  geom_smooth(method = lm , se = F) +
-  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
-  labs(title = "Correlation between CAPE positive score and Accuracy by Group",
-       x = "CAPE Positive Score", y = "Accuracy") +
-  theme_classic() +
-  stat_cor(label.x = 15)
-```
+# ggplot(data, aes(x = Pos_Freq, y = PCET_ACC2, col = Group)) + geom_point() +
+#   geom_smooth(method = lm , se = F) +
+#   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+#   labs(title = "Correlation between CAPE positive score and Accuracy by Group",
+#        x = "CAPE Positive Score", y = "Accuracy") +
+#   theme_classic() +
+#   stat_cor(label.x = 15)
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-1.png)<!-- -->
-
-``` r
 # Group x Efficiency Correlation 
-ggplot(data, aes(x = Pos_Freq, y = PCET_EFF, col = Group)) + geom_point() +
-  geom_smooth(method = lm , se = F) +
-  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
-  labs(title = "Correlation between CAPE positive score and Efficiency by Group",
-       x = "CAPE Positive Score", y = "Efficiency") +
-  theme_classic() +
-  stat_cor(label.x = 15)
-```
+# ggplot(data, aes(x = Pos_Freq, y = PCET_EFF, col = Group)) + geom_point() +
+#   geom_smooth(method = lm , se = F) +
+#   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+#   labs(title = "Correlation between CAPE positive score and Efficiency by Group",
+#        x = "CAPE Positive Score", y = "Efficiency") +
+#   theme_classic() +
+#   stat_cor(label.x = 15)
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-2.png)<!-- -->
-
-``` r
 # Group x Perseveration Error Correlation 
-ggplot(data, aes(x = Pos_Freq, y = PER_ER, col = Group)) + geom_point() +
-  geom_smooth(method = lm , se = F) +
-  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
-  labs(title = "Correlation between CAPE positive score and Perseveration Error by Group",
-       x = "CAPE Positive Score", y = "Perseveration Error") +
-  theme_classic() +
-  stat_cor(label.x = 15)
-```
+# ggplot(data, aes(x = Pos_Freq, y = PER_RES, col = Group)) + geom_point() +
+#   geom_smooth(method = lm , se = F) +
+#   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+#   labs(title = "Correlation between CAPE positive score and Perseveration Error by Group",
+#        x = "CAPE Positive Score", y = "Perseveration Error") +
+#   theme_classic() +
+#   stat_cor(label.x = 15)
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-3.png)<!-- -->
-
-``` r
+##### Plots #####
 # Anxiety x Accuracy Correlation by Group
-ggplot(data, aes(x = BAI.sum, y = PCET_ACC, col = Group), na.rm = T) + geom_point() +
+ggplot(data, aes(x = BAI.sum, y = PCET_ACC2, col = Group), na.rm = T) + geom_point() +
   geom_smooth(method = lm , se = F) +
   scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
   labs(title = "Correlation between BAI score and Accuracy", x = "BAI score", y = "Accuracy") +
@@ -991,37 +1015,7 @@ ggplot(data, aes(x = BAI.sum, y = PCET_ACC, col = Group), na.rm = T) + geom_poin
   stat_cor(label.x = 15)
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-4.png)<!-- -->
-
-``` r
-# Does Group x Anxiety Interaction predict Accuracy?
-  # X = Anxiety Score, # D = Group (1 = high NCP, 0 = low NCP) # Y = Accuracy
-  # Yi = B0 + B1Xi + B2Xi + ui
-interac <- data %>% select(PCET_ACC, BAI.sum, Group)
-summary(lm(data = interac, PCET_ACC ~ BAI.sum*Group))
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = PCET_ACC ~ BAI.sum * Group, data = interac)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -1.3532 -0.5146  0.1394  0.4117  1.1244 
-    ## 
-    ## Coefficients:
-    ##                   Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       1.160477   0.237542   4.885 1.41e-05 ***
-    ## BAI.sum           0.021077   0.009791   2.153 0.036876 *  
-    ## Grouplow          1.091842   0.307615   3.549 0.000933 ***
-    ## BAI.sum:Grouplow -0.040723   0.018383  -2.215 0.031963 *  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.6522 on 44 degrees of freedom
-    ##   (18 observations deleted due to missingness)
-    ## Multiple R-squared:  0.228,  Adjusted R-squared:  0.1754 
-    ## F-statistic: 4.331 on 3 and 44 DF,  p-value: 0.009261
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-1.png)<!-- -->
 
 ``` r
 # Anxiety x Efficiency Correlation by Group
@@ -1033,7 +1027,50 @@ ggplot(data, aes(x = BAI.sum, y = PCET_EFF, col = Group), na.rm = T) + geom_poin
   stat_cor(label.x = 15)
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-5.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-2.png)<!-- -->
+
+``` r
+# Anxiety x Perseveration Errors Correlation by Group 
+ggplot(data, aes(x = BAI.sum, y = PER_RES, col = Group), na.rm = T) + geom_point() +
+  geom_smooth(method = lm , se = F) +
+  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
+  labs(title = "Correlation between BAI score and Perseveration Error", x = "BAI score", y = "Perseveration Error") +
+  theme_classic() +
+  stat_cor(label.x = 15)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-3.png)<!-- -->
+
+``` r
+##### Stats #####
+# Does Group x Anxiety Interaction predict Accuracy?
+  # X = Anxiety Score, # D = Group (1 = high NCP, 0 = low NCP) # Y = Accuracy
+  # Yi = B0 + B1Xi + B2Xi + ui
+interac <- data %>% select(PCET_ACC2, BAI.sum, Group)
+summary(lm(data = interac, PCET_ACC2 ~ BAI.sum*Group))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = PCET_ACC2 ~ BAI.sum * Group, data = interac)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.7151 -0.6702  0.1607  0.5044  1.3976 
+    ## 
+    ## Coefficients:
+    ##                  Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       1.66101    0.29381   5.653 1.09e-06 ***
+    ## BAI.sum           0.02638    0.01211   2.178 0.034810 *  
+    ## Grouplow          1.35530    0.38048   3.562 0.000899 ***
+    ## BAI.sum:Grouplow -0.05108    0.02274  -2.247 0.029722 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.8067 on 44 degrees of freedom
+    ##   (18 observations deleted due to missingness)
+    ## Multiple R-squared:  0.2287, Adjusted R-squared:  0.1761 
+    ## F-statistic: 4.349 on 3 and 44 DF,  p-value: 0.009083
 
 ``` r
 # Does Group x Anxiety Interaction predict Efficiency?
@@ -1064,48 +1101,37 @@ summary(lm(data = interac1, PCET_EFF ~ BAI.sum*Group))
     ## F-statistic: 4.587 on 3 and 44 DF,  p-value: 0.007031
 
 ``` r
-# Anxiety x Perseveration Errors Correlation by Group 
-ggplot(data, aes(x = BAI.sum, y = PER_ER, col = Group), na.rm = T) + geom_point() +
-  geom_smooth(method = lm , se = F) +
-  scale_color_manual(values = wes_palette(n=2, name = "Chevalier1")) +
-  labs(title = "Correlation between BAI score and Perseveration Error", x = "BAI score", y = "Perseveration Error") +
-  theme_classic() +
-  stat_cor(label.x = 15)
-```
-
-![](NCP_Analysis_Prelim_files/figure-gfm/penntraits-6.png)<!-- -->
-
-``` r
 # Does Group x Anxiety Interaction predict Perseveration ERror?
-interac2 <- data %>% select(PER_ER, BAI.sum, Group)
-summary(lm(data = interac2, PER_ER ~ BAI.sum*Group))
+interac2 <- data %>% select(PER_RES, BAI.sum, Group)
+summary(lm(data = interac2, PER_RES ~ BAI.sum*Group))
 ```
 
     ## 
     ## Call:
-    ## lm(formula = PER_ER ~ BAI.sum * Group, data = interac2)
+    ## lm(formula = PER_RES ~ BAI.sum * Group, data = interac2)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -14.471  -4.222  -1.752   4.986  16.266 
+    ## -16.588  -4.926  -1.440   4.986  17.847 
     ## 
     ## Coefficients:
     ##                  Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       21.7880     2.6823   8.123 2.69e-10 ***
-    ## BAI.sum           -0.3310     0.1106  -2.993  0.00451 ** 
-    ## Grouplow         -15.1343     3.4735  -4.357 7.79e-05 ***
-    ## BAI.sum:Grouplow   0.5350     0.2076   2.577  0.01339 *  
+    ## (Intercept)       24.2030     2.9855   8.107 2.84e-10 ***
+    ## BAI.sum           -0.3735     0.1231  -3.035  0.00403 ** 
+    ## Grouplow         -17.1571     3.8662  -4.438 6.02e-05 ***
+    ## BAI.sum:Grouplow   0.6289     0.2310   2.722  0.00926 ** 
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 7.364 on 44 degrees of freedom
+    ## Residual standard error: 8.197 on 44 degrees of freedom
     ##   (18 observations deleted due to missingness)
-    ## Multiple R-squared:  0.3155, Adjusted R-squared:  0.2688 
-    ## F-statistic: 6.759 on 3 and 44 DF,  p-value: 0.0007557
+    ## Multiple R-squared:  0.3202, Adjusted R-squared:  0.2738 
+    ## F-statistic: 6.907 on 3 and 44 DF,  p-value: 0.0006535
 
-### PCET & Clinical Traits on Box Plot
+### Raincloud plot
 
 ``` r
+##### Grouping Anxiety Groups
 # Mean Anxiety Scores for Each Group
 anx.means <- data %>% select(Group, BAI.sum) %>%
   dplyr::group_by(Group) %>%
@@ -1121,65 +1147,128 @@ anx.data$anxiety <- ifelse(anx.data$Group == "high" & anx.data$BAI.sum > 17.88, 
 pcet <- merge(pcet, anx.data, by = "Subject.ID")
 colnames(pcet)[which(names(pcet) == "Group.x")] <- "Group"
 
-##### 1. Accuracy #####
-pcet %>%
-  filter(!is.na(anxiety)) %>%
-  mutate(Group = ifelse(Group == "high", "High NCP", "Low NCP"),
-         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
-         Interaction = factor(str_replace(interaction(Group, anxiety),
+##### Plotting Anxiety and Psychosis
+# Source Ben Marwick's code for Violin Plots
+source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
+
+pcet <- pcet %>% filter(!is.na(anxiety))
+
+# Raincloud plot theme
+raincloud_theme = theme(
+  text = element_text(size = 14),
+  axis.title.x = element_text(size = 14),
+  axis.title.y = element_blank(),
+  axis.text = element_text(size = 14),
+  axis.text.y = element_text(vjust = 0.3),
+  legend.title=element_text(size=14),
+  legend.text=element_text(size=14),
+  legend.position = "right",
+  plot.title = element_text(lineheight=.8,
+                            face="bold", size = 16),
+  panel.border = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_blank(),
+  axis.line.x = element_line(colour = 'black',
+                             size=0.5, linetype='solid'),
+  axis.line.y = element_line(colour = 'black',
+                             size=0.5, linetype='solid'))
+
+# Plot Accuracy
+pcet %>% 
+  mutate(Group = ifelse(Group == "high",
+                        "High NCP",
+                        "Low NCP"),
+         Anxiety = ifelse(anxiety == "above",
+                           "High Anx",
+                           "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group, Anxiety),
                                           '\\.', '\n'),
-                              ordered=TRUE)) %>%
-  ggplot(aes(x=Interaction, y=PCET_ACC)) +
-  geom_boxplot(aes(fill=Group)) +
-  geom_point(aes(shape=anxiety), size = 2) +
+                              ordered=TRUE)) %>% 
+  ggplot(aes(x = Interaction, y = PCET_ACC2, fill = Group)) + 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   alpha = .8) +
+  geom_point(aes(shape = Anxiety),
+             position = position_jitter(width = .05),
+             size = 2, alpha = 0.8) +
+  geom_boxplot(width = .1, outlier.shape = NA, alpha = 0.5) +
+  coord_flip(xlim=c(1.25,4.25)) +
+  labs(title = "Anxiety and Psychosis Symptoms on Accuracy by Group",
+       y = "Accuracy") +
+  scale_fill_discrete(guide = guide_legend(override.aes = list(shape = c(".", ".")))) +
+  scale_shape_discrete(guide = guide_legend(override.aes = list(size = 3))) +
+  theme_classic(base_size = 16) +
+  theme(axis.title.x = element_blank()) +
   scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title="Integrative Effects of Anxiety and Psychosis on Accuracy", y="Accuracy") +
-  theme_classic(base_size=10) +
-  theme(axis.title.x=element_blank())
+  raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-1.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/cloud-1.png)<!-- -->
 
 ``` r
-##### 3. Efficiency #####
-pcet %>%
-  filter(!is.na(anxiety)) %>%
-  mutate(Group = ifelse(Group == "high", "High NCP", "Low NCP"),
-         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
-         Interaction = factor(str_replace(interaction(Group, anxiety),
+# Plot Efficiency
+pcet %>% 
+  mutate(Group = ifelse(Group == "high",
+                        "High NCP",
+                        "Low NCP"),
+         Anxiety = ifelse(anxiety == "above",
+                           "High Anx",
+                           "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group, Anxiety),
                                           '\\.', '\n'),
-                              ordered=TRUE)) %>%
-  ggplot(aes(x=Interaction, y=PCET_EFF)) +
-  geom_boxplot(aes(fill=Group)) +
-  geom_point(aes(shape=anxiety), size = 2) +
+                              ordered=TRUE)) %>% 
+  ggplot(aes(x = Interaction, y = PCET_EFF, fill = Group)) + 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   alpha = .8) +
+  geom_point(aes(shape = Anxiety),
+             position = position_jitter(width = .05),
+             size = 2, alpha = 0.8) +
+  geom_boxplot(width = .1, outlier.shape = NA, alpha = 0.5) +
+  coord_flip(xlim=c(1.25,4.25)) +
+  labs(title = "Anxiety and Psychosis Symptoms on Efficiency by Group",
+       y = "Efficiency") +
+  scale_fill_discrete(guide = guide_legend(override.aes = list(shape = c(".", ".")))) +
+  scale_shape_discrete(guide = guide_legend(override.aes = list(size = 3))) +
+  theme_classic(base_size = 16) +
+  theme(axis.title.x = element_blank()) +
   scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title="Integrative Effects of Anxiety and Psychosis on Efficiency", y="Efficiency") +
-  theme_classic(base_size=10) +
-  theme(axis.title.x=element_blank())
+  raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-2.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/cloud-2.png)<!-- -->
 
 ``` r
-##### 4. Perseveration Error #####
-pcet %>%
-  filter(!is.na(anxiety)) %>%
-  mutate(Group = ifelse(Group == "high", "High NCP", "Low NCP"),
-         anxiety = ifelse(anxiety == "above", "High Anx", "Low Anx"),
-         Interaction = factor(str_replace(interaction(Group, anxiety),
+# Plot Perseverative Errors
+pcet %>% 
+  mutate(Group = ifelse(Group == "high",
+                        "High NCP",
+                        "Low NCP"),
+         Anxiety = ifelse(anxiety == "above",
+                           "High Anx",
+                           "Low Anx"),
+         Interaction = factor(str_replace(interaction(Group, Anxiety),
                                           '\\.', '\n'),
-                              ordered=TRUE)) %>%
-  ggplot(aes(x=Interaction, y=PER_ER)) +
-  geom_boxplot(aes(fill=Group)) +
-  geom_point(aes(shape=anxiety), size = 2) +
+                              ordered=TRUE)) %>% 
+  ggplot(aes(x = Interaction, y = PER_RES, fill = Group)) + 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   alpha = .8) +
+  geom_point(aes(shape = Anxiety),
+             position = position_jitter(width = .05),
+             size = 2, alpha = 0.8) +
+  geom_boxplot(width = .1, outlier.shape = NA, alpha = 0.5) +
+  coord_flip(xlim=c(1.25,4.25)) +
+  labs(title = "Anxiety and Psychosis Symptoms on Perseveration by Group",
+       y = "Perseverative Errors") +
+  scale_fill_discrete(guide = guide_legend(override.aes = list(shape = c(".", ".")))) +
+  scale_shape_discrete(guide = guide_legend(override.aes = list(size = 3))) +
+  theme_classic(base_size = 16) +
+  theme(axis.title.x = element_blank()) +
   scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
-  labs(title="Integrative Effects of Anxiety and Psychosis on Perseveration Errors", y="# Errors") +
-  theme_classic(base_size=10) +
-  theme(axis.title.x=element_blank())
+  raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/interacbox-3.png)<!-- -->
-\#\#\# PCET Performance by Block
+![](NCP_Analysis_Prelim_files/figure-gfm/cloud-3.png)<!-- -->
+
+### PCET Performance by Block
 
 ``` r
 pcet <- pcet %>% filter(PCET_CAT == 3) # excluding incomplete subjects (ie category achieved <3)
@@ -1211,10 +1300,12 @@ ggplot(pcet.trials, aes(x = variable, y = value, color = Group)) +
 ```
 
 ![](NCP_Analysis_Prelim_files/figure-gfm/trajectory-1.png)<!-- -->
-\#\#\# High- vs. Low- Performers Comparing the performance in Block 2
-and Block 3. If \# trials in Block 3 \> Block 2 = low performer (slow
-learner); Block 3 =\< Block 2 = high performer (fast learner). Then,
-comparing anxiety scores by performers.
+
+### High- vs. Low- Performers
+
+Comparing the performance in Block 2 and Block 3. If \# trials in Block
+3 \> Block 2 = low performer (slow learner); Block 3 =\< Block 2 = high
+performer (fast learner). Then, comparing anxiety scores by performers.
 
 ``` r
 pcet$learn <- ifelse(pcet$CAT3_TR-pcet$CAT2_TR > 0, "non", "learn")
@@ -1226,7 +1317,7 @@ pcet %>%
          Interaction = factor(str_replace(interaction(Group, Learning),
                                           '\\.', '\n'),
                               ordered=TRUE)) %>%
-  ggplot(aes(x=Interaction, y=PCET_ACC)) +
+  ggplot(aes(x=Interaction, y=PCET_ACC2)) +
   geom_boxplot(aes(fill=Group)) +
   geom_point(aes(shape=Learning), size = 2) +
   scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +
@@ -1264,7 +1355,7 @@ pcet %>%
          Interaction = factor(str_replace(interaction(Group, Learning),
                                           '\\.', '\n'),
                               ordered=TRUE)) %>%
-  ggplot(aes(x=Interaction, y=PER_ER)) +
+  ggplot(aes(x=Interaction, y=PER_RES)) +
   geom_boxplot(aes(fill=Group)) +
   geom_point(aes(shape=Learning), size = 2) +
   scale_fill_manual(values = wes_palette(n=3, name = "Chevalier1")) +

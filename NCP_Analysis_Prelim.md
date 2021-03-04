@@ -1221,3 +1221,73 @@ summary(lm(data = interac2, PER_ER ~ BAI.sum*Group))
     ##   (18 observations deleted due to missingness)
     ## Multiple R-squared:  0.3155, Adjusted R-squared:  0.2688 
     ## F-statistic: 6.759 on 3 and 44 DF,  p-value: 0.0007557
+
+### Removing Outlier
+
+![](NCP_Analysis_Prelim_files/figure-gfm/outlier-1.png)<!-- -->![](NCP_Analysis_Prelim_files/figure-gfm/outlier-2.png)<!-- -->![](NCP_Analysis_Prelim_files/figure-gfm/outlier-3.png)<!-- -->![](NCP_Analysis_Prelim_files/figure-gfm/outlier-4.png)<!-- -->![](NCP_Analysis_Prelim_files/figure-gfm/outlier-5.png)<!-- -->![](NCP_Analysis_Prelim_files/figure-gfm/outlier-6.png)<!-- -->
+
+    ## 
+    ## Call:
+    ## lm(formula = PCET_ACC2 ~ BAI.sum * Group, data = interac3)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.7151 -0.6819  0.2017  0.5193  1.4017 
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           1.65265    0.33308   4.962 1.15e-05 ***
+    ## BAI.sum               0.02697    0.01631   1.654  0.10537    
+    ## GroupLow NCP          1.36365    0.41320   3.300  0.00195 ** 
+    ## BAI.sum:GroupLow NCP -0.05168    0.02539  -2.035  0.04801 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.816 on 43 degrees of freedom
+    ##   (7 observations deleted due to missingness)
+    ## Multiple R-squared:  0.2169, Adjusted R-squared:  0.1623 
+    ## F-statistic: 3.971 on 3 and 43 DF,  p-value: 0.01388
+
+    ## 
+    ## Call:
+    ## lm(formula = PCET_EFF ~ BAI.sum * Group, data = interac4)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.18753 -0.06961  0.02867  0.06685  0.15814 
+    ## 
+    ## Coefficients:
+    ##                       Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           0.153325   0.037158   4.126 0.000166 ***
+    ## BAI.sum               0.003034   0.001819   1.668 0.102656    
+    ## GroupLow NCP          0.154894   0.046096   3.360 0.001642 ** 
+    ## BAI.sum:GroupLow NCP -0.005823   0.002833  -2.056 0.045932 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.09103 on 43 degrees of freedom
+    ##   (7 observations deleted due to missingness)
+    ## Multiple R-squared:  0.224,  Adjusted R-squared:  0.1699 
+    ## F-statistic: 4.138 on 3 and 43 DF,  p-value: 0.01157
+
+    ## 
+    ## Call:
+    ## lm(formula = PER_ER ~ BAI.sum * Group, data = interac5)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -14.689  -4.335  -1.705   4.977  16.266 
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           22.2240     3.0373   7.317 4.49e-09 ***
+    ## BAI.sum               -0.3622     0.1487  -2.436 0.019090 *  
+    ## GroupLow NCP         -15.5702     3.7680  -4.132 0.000163 ***
+    ## BAI.sum:GroupLow NCP   0.5662     0.2316   2.445 0.018653 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 7.441 on 43 degrees of freedom
+    ##   (7 observations deleted due to missingness)
+    ## Multiple R-squared:  0.3024, Adjusted R-squared:  0.2537 
+    ## F-statistic: 6.213 on 3 and 43 DF,  p-value: 0.001334

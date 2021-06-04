@@ -67,279 +67,142 @@ knitr::kable(format(demo, digits = 3, drop0trailing = TRUE), caption = "Particip
 ```
 
 <table class="table table-striped" style="margin-left: auto; margin-right: auto;">
-
 <caption>
-
 Participant Demographics
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 High NCP
-
 </th>
-
 <th style="text-align:left;">
-
 Low NCP
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr grouplength="1">
-
 <td colspan="3" style="border-bottom: 1px solid;">
-
 <strong>Count</strong>
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 N
-
 </td>
-
 <td style="text-align:left;">
-
 29
-
 </td>
-
 <td style="text-align:left;">
-
 37
-
 </td>
-
 </tr>
-
 <tr grouplength="2">
-
 <td colspan="3" style="border-bottom: 1px solid;">
-
 <strong>Age</strong>
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Mean
-
 </td>
-
 <td style="text-align:left;">
-
 20.786
-
 </td>
-
 <td style="text-align:left;">
-
 20.056
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 SD
-
 </td>
-
 <td style="text-align:left;">
-
 1.95
-
 </td>
-
 <td style="text-align:left;">
-
 1.97
-
 </td>
-
 </tr>
-
 <tr grouplength="2">
-
 <td colspan="3" style="border-bottom: 1px solid;">
-
 <strong>Sex</strong>
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Female
-
 </td>
-
 <td style="text-align:left;">
-
 22
-
 </td>
-
 <td style="text-align:left;">
-
 26
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Male
-
 </td>
-
 <td style="text-align:left;">
-
 6
-
 </td>
-
 <td style="text-align:left;">
-
 10
-
 </td>
-
 </tr>
-
 <tr grouplength="4">
-
 <td colspan="3" style="border-bottom: 1px solid;">
-
 <strong>Race</strong>
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 East Asian
-
 </td>
-
 <td style="text-align:left;">
-
 6
-
 </td>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 White
-
 </td>
-
 <td style="text-align:left;">
-
 7
-
 </td>
-
 <td style="text-align:left;">
-
 22
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Interracial
-
 </td>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-
 Black
-
 </td>
-
 <td style="text-align:left;">
-
 6
-
 </td>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ### Let’s talk about sex distribution baby
@@ -360,80 +223,46 @@ knitr::kable(format(test.frame, digits = 5, drop0trailing = TRUE),
 ```
 
 <table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
-
 <caption>
-
-p-value \> .05, Group (High vs. Low) and Sex (M vs. F) are independent
-
+p-value &gt; .05, Group (High vs. Low) and Sex (M vs. F) are independent
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 X\_squared
-
 </th>
-
 <th style="text-align:left;">
-
 df
-
 </th>
-
 <th style="text-align:left;">
-
 p.value
-
 </th>
-
 <th style="text-align:left;">
-
 method
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 0.36906
-
 </td>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 0.8315
-
 </td>
-
 <td style="text-align:left;">
-
 Pearson’s Chi-squared test
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ``` r
+test2 <- chisq.test(table(data$Group, data$Age))
+
 # Chi-square to test whether Group is independent from sex
   # CAPE Positive Frequency scores are used to define NCP
   # 1st Q: 0-5, 2nd Q: 6-8, 3rd Q: 9-11, 4th Q: 12 and above
@@ -457,78 +286,42 @@ knitr::kable(format(test2.frame, digits = 5, drop0trailing = TRUE),
 ```
 
 <table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
-
 <caption>
-
-p-value \> .05, Quartiles (1, 2, 3, 4)) and Sex (M vs. F) are
+p-value &gt; .05, Quartiles (1, 2, 3, 4)) and Sex (M vs. F) are
 independent
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 X\_squared
-
 </th>
-
 <th style="text-align:left;">
-
 df
-
 </th>
-
 <th style="text-align:left;">
-
 p.value
-
 </th>
-
 <th style="text-align:left;">
-
 method
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 2.9604
-
 </td>
-
 <td style="text-align:left;">
-
 6
-
 </td>
-
 <td style="text-align:left;">
-
 0.8138
-
 </td>
-
 <td style="text-align:left;">
-
 Pearson’s Chi-squared test
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ### Self Report Data
@@ -552,52 +345,28 @@ ggplot(SR, aes(x=Pos_Freq, y=BAI.sum, col = Group)) +
 
 ``` r
 # Linear Regression Summary 
-low.NCP <- SR %>% filter(Group == "Low")
-summary(lm(low.NCP$BAI.sum~low.NCP$Pos_Freq)) # no significant relationship between BAI and CAPE
+summary(lm(data$BAI.sum~data$Group)) #p<.05; significant main effect of group on anxiety such that the low-NCP group has significantly lower BAI scores than the high-NCP group
 ```
 
     ## 
     ## Call:
-    ## lm(formula = low.NCP$BAI.sum ~ low.NCP$Pos_Freq)
-    ## 
-    ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -7.367 -5.866 -3.866  2.384 21.134 
-    ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)        7.2233     2.6946   2.681    0.012 *
-    ## low.NCP$Pos_Freq   0.6429     0.5699   1.128    0.269  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 8.159 on 29 degrees of freedom
-    ##   (6 observations deleted due to missingness)
-    ## Multiple R-squared:  0.04203,    Adjusted R-squared:  0.009002 
-    ## F-statistic: 1.273 on 1 and 29 DF,  p-value: 0.2685
-
-``` r
-high.NCP <- SR %>% filter(Group == "High")
-summary(lm(high.NCP$BAI.sum~high.NCP$Pos_Freq)) # no significant relationship between BAI and CAPE
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = high.NCP$BAI.sum ~ high.NCP$Pos_Freq)
+    ## lm(formula = data$BAI.sum ~ data$Group)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -23.859 -10.335  -0.585   5.017  39.369 
+    ## -15.875  -7.774  -2.774   4.175  44.125 
     ## 
     ## Coefficients:
-    ##                   Estimate Std. Error t value Pr(>|t|)
-    ## (Intercept)         -1.327     14.241  -0.093    0.927
-    ## high.NCP$Pos_Freq    1.409      1.023   1.377    0.182
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     17.875      2.322   7.697 3.42e-10 ***
+    ## data$GroupLow   -8.101      3.093  -2.619   0.0115 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 14.24 on 22 degrees of freedom
-    ##   (5 observations deleted due to missingness)
-    ## Multiple R-squared:  0.07938,    Adjusted R-squared:  0.03753 
-    ## F-statistic: 1.897 on 1 and 22 DF,  p-value: 0.1823
+    ## Residual standard error: 11.38 on 53 degrees of freedom
+    ##   (11 observations deleted due to missingness)
+    ## Multiple R-squared:  0.1146, Adjusted R-squared:  0.09787 
+    ## F-statistic: 6.858 on 1 and 53 DF,  p-value: 0.01148
 
 ### PCET (Penn Conditional Exclusion Task) Performance
 
@@ -628,6 +397,74 @@ high <- pcet %>% filter(Group == "High") #subset of high-NCP
 low <- pcet %>% filter(Group == "Low") #subset of low-NCP
 pcet$Group <- factor(pcet$Group, levels = c("Low", "High")) # "Group" variable w/ 2 factors
 
+data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
+data2 <- data %>% select(PCET_ACC2, BAI.sum) %>% filter(!is.na(PCET_ACC2) & !is.na(BAI.sum))
+summary(lm(data=data2, BAI.sum~PCET_ACC2))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = BAI.sum ~ PCET_ACC2, data = data2)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -13.815  -8.769  -3.566   4.574  48.198 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)  
+    ## (Intercept)  13.2056     5.4925   2.404   0.0203 *
+    ## PCET_ACC2     0.1828     2.0567   0.089   0.9295  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 12.53 on 46 degrees of freedom
+    ## Multiple R-squared:  0.0001718,  Adjusted R-squared:  -0.02156 
+    ## F-statistic: 0.007904 on 1 and 46 DF,  p-value: 0.9295
+
+``` r
+data3 <- data %>% select(PCET_EFF, BAI.sum) %>% filter(!is.na(PCET_EFF) & !is.na(BAI.sum))
+summary(lm(data=data3, BAI.sum~PCET_EFF))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = BAI.sum ~ PCET_EFF, data = data3)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -13.856  -8.806  -3.538   4.567  48.131 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)  
+    ## (Intercept)   13.109      4.960   2.643   0.0112 *
+    ## PCET_EFF       2.213     18.322   0.121   0.9044  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 12.53 on 46 degrees of freedom
+    ## Multiple R-squared:  0.000317,   Adjusted R-squared:  -0.02142 
+    ## F-statistic: 0.01459 on 1 and 46 DF,  p-value: 0.9044
+
+``` r
+ggplot(data2, aes(x=BAI.sum, y=PCET_ACC2)) + 
+ geom_point() +
+  geom_smooth(method = lm , se = TRUE)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-1.png)<!-- -->
+
+``` r
+ggplot(data3, aes(x=BAI.sum, y=PCET_EFF)) + 
+ geom_point() +
+  geom_smooth(method = lm , se = TRUE)
+```
+
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-2.png)<!-- -->
+
+``` r
+library(outliers)
+
+
 ##### 1. Category Achieved #####
 # N, mean, and SD of high-NCP
 h.cat <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -640,7 +477,7 @@ l.cat <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !i
 
 # Significance Test
 #var.test(High$PCET_CAT, low$PCET_CAT) #P<.05, heterogeneous sample
-cat.t <- t.test(high$PCET_CAT, low$PCET_CAT, var.equal=F)
+cat.t <- t.test(high$PCET_CAT, low$PCET_CAT, var.equal=F) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
 cat.d <- cohen.d(high$PCET_CAT, low$PCET_CAT, na.rm=T)
 
 ##### 2. Accuracy (PCET_ACC) #####
@@ -673,23 +510,14 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-1.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
 
 ``` r
 # Significance Test of Accuracy by Group
 #var.test(High$PCET_ACC, low$PCET_ACC) #Fisher's F-test, p>0.05; homogeneous sample
 acc.t <- t.test(high$PCET_ACC2, low$PCET_ACC2, var.equal = TRUE) #p<.05
 acc.d <- cohen.d(high$PCET_ACC2, low$PCET_ACC2, na.rm = T)
-acc.aov <- pcet %>% anova_test(PCET_ACC2~Group)
-get_anova_table(acc.aov)
-```
 
-    ## ANOVA Table (type II tests)
-    ## 
-    ##   Effect DFn DFd     F     p p<.05   ges
-    ## 1  Group   1  55 6.499 0.014     * 0.106
-
-``` r
 # 3. Efficiency (PCET_EFF)
 # N, mean, and SD of high-NCP
 h.eff <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -718,23 +546,14 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-2.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-4.png)<!-- -->
 
 ``` r
 # Significance Test of Efficiency by Group 
 #var.test(high$PCET_EFF, low$PCET_EFF) #Fisher's F-test, p>0.05; homogeneous sample
 eff.t <- t.test(high$PCET_EFF, low$PCET_EFF, var.equal = TRUE) 
 eff.d <- cohen.d(high$PCET_EFF, low$PCET_EFF, na.rm = T)
-eff.aov <- pcet %>% anova_test(PCET_EFF~Group)
-get_anova_table(eff.aov)
-```
 
-    ## ANOVA Table (type II tests)
-    ## 
-    ##   Effect DFn DFd     F     p p<.05   ges
-    ## 1  Group   1  55 6.687 0.012     * 0.108
-
-``` r
 # 4. Perseveration Error Rate (PER_ER)
 # N, mean, and SD of high-NCP
 h.err <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -764,23 +583,14 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-5.png)<!-- -->
 
 ``` r
 # Significance Test of Perseveration Error by Group
 #var.test(as.numeric(score.high$value), as.numeric(score.low$value)) #homogeneous
 error.t <- t.test(high$PER_ER, low$PER_ER, var.equal=T) #p=0.014
 error.d <- cohen.d(high$PER_ER, low$PER_ER, na.rm = T)
-err.aov <- pcet %>% anova_test(PER_ER~Group)
-get_anova_table(err.aov)
-```
 
-    ## ANOVA Table (type II tests)
-    ## 
-    ##   Effect DFn DFd     F     p p<.05   ges
-    ## 1  Group   1  55 8.557 0.005     * 0.135
-
-``` r
 # Summary Table
 h.cat = paste(round(h.cat['mean'], 2), "(", round(h.cat['sd'], 2), ")", sep = "")
 l.cat = paste(round(l.cat['mean'], 2), "(", round(l.cat['sd'], 2), ")", sep = "")
@@ -804,189 +614,97 @@ knitr::kable(performance.table,caption = "Category Achieved, Accuracy, Efficienc
 ```
 
 <table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
-
 <caption>
-
 Category Achieved, Accuracy, Efficiency, and Perseveration Summary
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 CAT
-
 </th>
-
 <th style="text-align:left;">
-
 Accuracy
-
 </th>
-
 <th style="text-align:left;">
-
 Efficiency
-
 </th>
-
 <th style="text-align:left;">
-
 Perseveration
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 High NCP
-
 </td>
-
 <td style="text-align:left;">
-
 2.5(0.59)
-
 </td>
-
 <td style="text-align:left;">
-
 2.18(0.92)
-
 </td>
-
 <td style="text-align:left;">
-
 0.21(0.1)
-
 </td>
-
 <td style="text-align:left;">
-
 15.33(9.63)
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Low NCP
-
 </td>
-
 <td style="text-align:left;">
-
 2.82(0.39)
-
 </td>
-
 <td style="text-align:left;">
-
 2.75(0.76)
-
 </td>
-
 <td style="text-align:left;">
-
 0.28(0.08)
-
 </td>
-
 <td style="text-align:left;">
-
 9.09(6.49)
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 p-value
-
 </td>
-
 <td style="text-align:left;">
-
 0.027
-
 </td>
-
 <td style="text-align:left;">
-
 0.014
-
 </td>
-
 <td style="text-align:left;">
-
 0.012
-
 </td>
-
 <td style="text-align:left;">
-
 0.005
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Cohen’s D
-
 </td>
-
 <td style="text-align:left;">
-
 0.657
-
 </td>
-
 <td style="text-align:left;">
-
 0.684
-
 </td>
-
 <td style="text-align:left;">
-
 0.694
-
 </td>
-
 <td style="text-align:left;">
-
 0.785
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ### Raincloud plot of Accuracy, Efficiency, and Errors by NCP and Anxiety
@@ -1025,7 +743,28 @@ pcet <- pcet %>%
 
 # Relevel Interaction variable factor so that high NCP is above low NCP
 pcet$Interaction <- factor(pcet$Interaction, levels = c("Low NCP\nHigh Anx", "Low NCP\nLow Anx", "High NCP\nHigh Anx", "High NCP\nLow Anx")) 
+# Anxiety by group
+pcet %>% 
+  ggplot(aes(x = Group, y = BAI.sum, fill = Group)) + 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   alpha = .8) +
+  geom_point(aes(shape = Group),
+             position = position_jitter(width = .05),
+             size = 2, alpha = 0.8) +
+  geom_boxplot(width = .1, outlier.shape = NA, alpha = 0.5) +
+  #scale_x_discrete(labels=grouplabs) +
+  coord_flip() +
+  labs(title = "Anxiety By Group",
+       y = "BAI Score") +
+  theme_classic() +
+  scale_fill_manual(values = c("#f1a340","#998ec3")) +
+  guides(fill = guide_legend(reverse=TRUE), shape = FALSE) +
+  raincloud_theme
+```
 
+![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-1.png)<!-- -->
+
+``` r
 # Plot Accuracy
 pcet %>%
   ggplot(aes(x = Interaction, y = PCET_ACC2, fill = Interaction)) + 
@@ -1047,7 +786,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-1.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-2.png)<!-- -->
 
 ``` r
 # Plot Efficiency
@@ -1071,7 +810,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-2.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-3.png)<!-- -->
 
 ``` r
 # Plot Perseverative Errors
@@ -1094,7 +833,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/anxrelation-4.png)<!-- -->
 
 ### PCET & Clinical Traits
 

@@ -4,8 +4,8 @@ Jadyn Park
 1/20/2021
 
 **Research Questions:**  
-**1.** Do implicit learning strategies differ between Low NCP and High
-NCP?  
+**1.** Do High-NCP and Low-NCP groups perform differently in a cognitive
+task?  
 **2.** Are clinically relevant traits/symptoms (i.e., anxiety) related
 to the difference in group performance?  
 **3.** Do relevant traits contribute to perseveration errors in implicit
@@ -398,70 +398,22 @@ low <- pcet %>% filter(Group == "Low") #subset of low-NCP
 pcet$Group <- factor(pcet$Group, levels = c("Low", "High")) # "Group" variable w/ 2 factors
 
 data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
-data2 <- data %>% select(PCET_ACC2, BAI.sum) %>% filter(!is.na(PCET_ACC2) & !is.na(BAI.sum))
-summary(lm(data=data2, BAI.sum~PCET_ACC2))
-```
 
-    ## 
-    ## Call:
-    ## lm(formula = BAI.sum ~ PCET_ACC2, data = data2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -13.815  -8.769  -3.566   4.574  48.198 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)  13.2056     5.4925   2.404   0.0203 *
-    ## PCET_ACC2     0.1828     2.0567   0.089   0.9295  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 12.53 on 46 degrees of freedom
-    ## Multiple R-squared:  0.0001718,  Adjusted R-squared:  -0.02156 
-    ## F-statistic: 0.007904 on 1 and 46 DF,  p-value: 0.9295
+#data2 <- data %>% select(PCET_ACC2, BAI.sum) %>% filter(!is.na(PCET_ACC2) & !is.na(BAI.sum))
+#summary(lm(data=data2, BAI.sum~PCET_ACC2))
 
-``` r
-data3 <- data %>% select(PCET_EFF, BAI.sum) %>% filter(!is.na(PCET_EFF) & !is.na(BAI.sum))
-summary(lm(data=data3, BAI.sum~PCET_EFF))
-```
+#data3 <- data %>% select(PCET_EFF, BAI.sum) %>% filter(!is.na(PCET_EFF) & !is.na(BAI.sum))
+#summary(lm(data=data3, BAI.sum~PCET_EFF))
 
-    ## 
-    ## Call:
-    ## lm(formula = BAI.sum ~ PCET_EFF, data = data3)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -13.856  -8.806  -3.538   4.567  48.131 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)   13.109      4.960   2.643   0.0112 *
-    ## PCET_EFF       2.213     18.322   0.121   0.9044  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 12.53 on 46 degrees of freedom
-    ## Multiple R-squared:  0.000317,   Adjusted R-squared:  -0.02142 
-    ## F-statistic: 0.01459 on 1 and 46 DF,  p-value: 0.9044
 
-``` r
-ggplot(data2, aes(x=BAI.sum, y=PCET_ACC2)) + 
- geom_point() +
-  geom_smooth(method = lm , se = TRUE)
-```
+#ggplot(data2, aes(x=BAI.sum, y=PCET_ACC2)) + 
+# geom_point() +
+#  geom_smooth(method = lm , se = TRUE)
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-1.png)<!-- -->
+#ggplot(data3, aes(x=BAI.sum, y=PCET_EFF)) + 
+# geom_point() +
+#  geom_smooth(method = lm , se = TRUE)
 
-``` r
-ggplot(data3, aes(x=BAI.sum, y=PCET_EFF)) + 
- geom_point() +
-  geom_smooth(method = lm , se = TRUE)
-```
-
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-2.png)<!-- -->
-
-``` r
 library(outliers)
 
 
@@ -480,6 +432,54 @@ l.cat <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !i
 cat.t <- t.test(high$PCET_CAT, low$PCET_CAT, var.equal=F) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
 cat.d <- cohen.d(high$PCET_CAT, low$PCET_CAT, na.rm=T)
 
+summary(lm(data$PCET_CAT~data$Group))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_CAT ~ data$Group)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.5000 -0.5000  0.1818  0.1818  0.5000 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)    2.50000    0.09889  25.280   <2e-16 ***
+    ## data$GroupLow  0.31818    0.12997   2.448   0.0176 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.4845 on 55 degrees of freedom
+    ##   (9 observations deleted due to missingness)
+    ## Multiple R-squared:  0.09826,    Adjusted R-squared:  0.08187 
+    ## F-statistic: 5.993 on 1 and 55 DF,  p-value: 0.01758
+
+``` r
+summary(lm(data$PCET_CAT~data$BAI.sum))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_CAT ~ data$BAI.sum)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.6547 -0.6587  0.3202  0.3342  0.4025 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   2.68621    0.11332  23.705   <2e-16 ***
+    ## data$BAI.sum -0.00143    0.00617  -0.232    0.818    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.5244 on 46 degrees of freedom
+    ##   (18 observations deleted due to missingness)
+    ## Multiple R-squared:  0.001167,   Adjusted R-squared:  -0.02055 
+    ## F-statistic: 0.05374 on 1 and 46 DF,  p-value: 0.8177
+
+``` r
 ##### 2. Accuracy (PCET_ACC) #####
 # N, mean, and SD of high-NCP
 h.acc<- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -510,7 +510,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-1.png)<!-- -->
 
 ``` r
 # Significance Test of Accuracy by Group
@@ -518,6 +518,54 @@ pcet %>%
 acc.t <- t.test(high$PCET_ACC2, low$PCET_ACC2, var.equal = TRUE) #p<.05
 acc.d <- cohen.d(high$PCET_ACC2, low$PCET_ACC2, na.rm = T)
 
+summary(lm(data$PCET_ACC2~data$Group))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_ACC2 ~ data$Group)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.6952 -0.7964  0.3205  0.5840  1.3484 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     2.1810     0.1696  12.858   <2e-16 ***
+    ## data$GroupLow   0.5683     0.2229   2.549   0.0136 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.831 on 55 degrees of freedom
+    ##   (9 observations deleted due to missingness)
+    ## Multiple R-squared:  0.1057, Adjusted R-squared:  0.08941 
+    ## F-statistic: 6.499 on 1 and 55 DF,  p-value: 0.01361
+
+``` r
+summary(lm(data$PCET_ACC2~data$BAI.sum))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_ACC2 ~ data$BAI.sum)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.6135 -0.9002  0.4018  0.7442  1.0047 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  2.5086996  0.1940844  12.926   <2e-16 ***
+    ## data$BAI.sum 0.0009395  0.0105679   0.089     0.93    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.8982 on 46 degrees of freedom
+    ##   (18 observations deleted due to missingness)
+    ## Multiple R-squared:  0.0001718,  Adjusted R-squared:  -0.02156 
+    ## F-statistic: 0.007904 on 1 and 46 DF,  p-value: 0.9295
+
+``` r
 # 3. Efficiency (PCET_EFF)
 # N, mean, and SD of high-NCP
 h.eff <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -546,7 +594,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-4.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-2.png)<!-- -->
 
 ``` r
 # Significance Test of Efficiency by Group 
@@ -554,6 +602,54 @@ pcet %>%
 eff.t <- t.test(high$PCET_EFF, low$PCET_EFF, var.equal = TRUE) 
 eff.d <- cohen.d(high$PCET_EFF, low$PCET_EFF, na.rm = T)
 
+summary(lm(data$PCET_EFF~data$Group))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_EFF ~ data$Group)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.18565 -0.09183  0.03304  0.07135  0.14187 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)    0.21393    0.01899  11.268 6.53e-16 ***
+    ## data$GroupLow  0.06453    0.02495   2.586   0.0124 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.09301 on 55 degrees of freedom
+    ##   (9 observations deleted due to missingness)
+    ## Multiple R-squared:  0.1084, Adjusted R-squared:  0.09219 
+    ## F-statistic: 6.687 on 1 and 55 DF,  p-value: 0.01239
+
+``` r
+summary(lm(data$PCET_EFF~data$BAI.sum))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PCET_EFF ~ data$BAI.sum)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.19226 -0.11202  0.04483  0.08406  0.11185 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  0.2501129  0.0217844  11.481 4.21e-15 ***
+    ## data$BAI.sum 0.0001433  0.0011862   0.121    0.904    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.1008 on 46 degrees of freedom
+    ##   (18 observations deleted due to missingness)
+    ## Multiple R-squared:  0.000317,   Adjusted R-squared:  -0.02142 
+    ## F-statistic: 0.01459 on 1 and 46 DF,  p-value: 0.9044
+
+``` r
 # 4. Perseveration Error Rate (PER_ER)
 # N, mean, and SD of high-NCP
 h.err <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
@@ -583,7 +679,7 @@ pcet %>%
   raincloud_theme
 ```
 
-![](NCP_Analysis_Prelim_files/figure-gfm/pcet-5.png)<!-- -->
+![](NCP_Analysis_Prelim_files/figure-gfm/pcet-3.png)<!-- -->
 
 ``` r
 # Significance Test of Perseveration Error by Group
@@ -591,6 +687,54 @@ pcet %>%
 error.t <- t.test(high$PER_ER, low$PER_ER, var.equal=T) #p=0.014
 error.d <- cohen.d(high$PER_ER, low$PER_ER, na.rm = T)
 
+summary(lm(data$PER_ER~data$Group))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PER_ER ~ data$Group)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -13.333  -5.333  -2.091   4.909  17.909 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     15.333      1.624   9.443 4.17e-13 ***
+    ## data$GroupLow   -6.242      2.134  -2.925  0.00499 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 7.954 on 55 degrees of freedom
+    ##   (9 observations deleted due to missingness)
+    ## Multiple R-squared:  0.1346, Adjusted R-squared:  0.1189 
+    ## F-statistic: 8.557 on 1 and 55 DF,  p-value: 0.004992
+
+``` r
+summary(lm(data$PER_ER~data$BAI.sum))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = data$PER_ER ~ data$BAI.sum)
+    ## 
+    ## Residuals:
+    ##    Min     1Q Median     3Q    Max 
+    ## -8.960 -6.877 -2.809  5.024 18.135 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  12.16647    1.87601   6.485 5.41e-08 ***
+    ## data$BAI.sum -0.05029    0.10215  -0.492    0.625    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 8.682 on 46 degrees of freedom
+    ##   (18 observations deleted due to missingness)
+    ## Multiple R-squared:  0.005242,   Adjusted R-squared:  -0.01638 
+    ## F-statistic: 0.2424 on 1 and 46 DF,  p-value: 0.6248
+
+``` r
 # Summary Table
 h.cat = paste(round(h.cat['mean'], 2), "(", round(h.cat['sd'], 2), ")", sep = "")
 l.cat = paste(round(l.cat['mean'], 2), "(", round(l.cat['sd'], 2), ")", sep = "")

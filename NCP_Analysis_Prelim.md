@@ -514,7 +514,7 @@ pcet %>%
   #scale_x_discrete(labels=grouplabs) +
   coord_flip() +
   labs(title = "Perseveration Errors By Group",
-       y = "# of Perseverative Responses") +
+       y = "# of Perseverative Errors") +
   theme_classic() +
   scale_fill_manual(values = c("#f1a340","#998ec3")) +
   guides(fill = guide_legend(reverse=TRUE), shape = FALSE) +
@@ -961,7 +961,7 @@ pcet %>%
   geom_boxplot(width = .1, outlier.shape = NA, alpha = 0.5) +
   coord_flip() +
   labs(title = "Anxiety and Psychosis Symptoms on Perseveration by Group",
-       y = "# Perseverative Trials") +
+       y = "# Perseverative Errors") +
   scale_fill_discrete(guide = guide_legend(override.aes = list(shape = c(".", ".")))) +
   scale_shape_discrete(guide = guide_legend(override.aes = list(size = 3))) +
   guides(fill = guide_legend(reverse=TRUE)) +

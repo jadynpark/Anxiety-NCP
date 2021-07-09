@@ -328,8 +328,61 @@ Pearson’s Chi-squared test
 
 ``` r
 #Self Report data (CAPE positive & total, LSHS, BAI, BIS, BAS)
-SR <- data %>% select(Subject.ID, Group, Pos_Freq, CAPE.sum, LSHS.sum, HPS.sum, BAI.sum, BIS.sum, BAS.fun, BAS.reward, BAS.drive, BAS.sum) 
+SR <- data %>% select(Subject.ID, Group, Pos_Freq, CAPE.sum, LSHS.sum, HPS.sum, BAI.sum, BIS.sum, BAS.fun, BAS.reward, BAS.drive, BAS.sum)
 
+# CAPE Positive Score
+cape <- data %>% dplyr::group_by(Group) %>% summarise(mean=mean(Pos_Freq), sd=sd(Pos_Freq))
+#var.test(data$Pos_Freq~data$Group, na.rm=T) heterogeneous sample; p<.05
+cape.t <- t.test(data$Pos_Freq~data$Group, var.equal=F)
+
+knitr::kable(cape,caption = "CAPE Positive Frequency Score by Group") %>%
+  kable_styling(c("striped", "bordered", full_width = T)) 
+```
+
+<table class="table table-striped table-bordered" style="margin-left: auto; margin-right: auto;">
+<caption>
+CAPE Positive Frequency Score by Group
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Group
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+High
+</td>
+<td style="text-align:right;">
+13.724138
+</td>
+<td style="text-align:right;">
+3.574678
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Low
+</td>
+<td style="text-align:right;">
+4.216216
+</td>
+<td style="text-align:right;">
+2.507047
+</td>
+</tr>
+</tbody>
+</table>
+
+``` r
 # BAI-CAPE regression graph 
 ggplot(SR, aes(x=Pos_Freq, y=BAI.sum, col = Group)) + 
  geom_point() +
@@ -404,30 +457,19 @@ data <- read.csv("~/Desktop/Anxiety NCP/Anxiety_NCP_master.csv", header = TRUE)
 
 library(outliers)
 ##### 1. Category Achieved #####
-# N, mean, and SD of high-NCP
-h.cat <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
-                                                       mean = mean(PCET_CAT, na.rm = T),
-                                                       sd = sd(PCET_CAT, na.rm = T)) 
-# N, mean, and SD of low-NCP
-l.cat <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !is.na(PCET_CAT)),
-                                                       mean = mean(PCET_CAT, na.rm = T),
-                                                       sd = sd(PCET_CAT, na.rm = T)) 
+# N, mean, and SD of high-NCP vs. low-NCP
+cat_n <- pcet %>% dplyr::group_by(Group) %>% summarise(count=sum(!is.na(PCET_CAT)))
+cat <- pcet %>% dplyr::group_by(Group) %>% summarise(mean=mean(PCET_CAT, na.rm=T), sd=sd(PCET_CAT, na.rm=T))
 
 # Significance Test
-#var.test(High$PCET_CAT, low$PCET_CAT) #P<.05, heterogeneous sample
-cat.t <- t.test(high$PCET_CAT, low$PCET_CAT, var.equal=F) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
-cat.d <- cohen.d(high$PCET_CAT, low$PCET_CAT, na.rm=T)
+#var.test(pcet$PCET_CAT~pcet$Group) #p<.05, heterogeneous sample
+cat.t <- t.test(pcet$PCET_CAT~pcet$Group, var.equal=F) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
+cat.d <- cohen.d(pcet$PCET_CAT~pcet$Group, na.rm=T)
 
 ##### 2. Accuracy (PCET_ACC) #####
-# N, mean, and SD of high-NCP
-h.acc<- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
-                                                       mean = mean(PCET_ACC2, na.rm = T),
-                                                       sd = sd(PCET_ACC2, na.rm = T)) 
-
-# N, mean, and SD of low-NCP
-l.acc <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !is.na(PCET_CAT)),
-                                                           mean = mean(PCET_ACC2, na.rm = T),
-                                                           sd = sd(PCET_ACC2, na.rm = T)) 
+# N, mean, and SD of high-NCP vs. low-NCP
+acc_n <- pcet %>% dplyr::group_by(Group) %>% summarise(count=sum(!is.na(PCET_ACC2)))
+acc <- pcet %>% dplyr::group_by(Group) %>% summarise(mean=mean(PCET_ACC2, na.rm=T), sd=sd(PCET_ACC2, na.rm=T))
   
 # Accuracy Plot
 #grouplabs <- c("Low NCP", "High NCP")
@@ -452,19 +494,15 @@ pcet %>%
 
 ``` r
 # Significance Test of Accuracy by Group
-#var.test(High$PCET_ACC, low$PCET_ACC) #Fisher's F-test, p>0.05; homogeneous sample
-acc.t <- t.test(high$PCET_ACC2, low$PCET_ACC2, var.equal = TRUE) #p<.05
-acc.d <- cohen.d(high$PCET_ACC2, low$PCET_ACC2, na.rm = T)
+#var.test(pcet$PCET_ACC2~pcet$Group) #Fisher's F-test, p>0.05; homogeneous sample
+acc.t <- t.test(pcet$PCET_ACC2~pcet$Group, var.equal=T) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
+acc.d <- cohen.d(pcet$PCET_ACC2~pcet$Group, na.rm=T)
 
 # 3. Efficiency (PCET_EFF)
-# N, mean, and SD of high-NCP
-h.eff <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
-                                                        mean = mean(PCET_EFF, na.rm = T),
-                                                        sd = sd(PCET_EFF, na.rm = T)) 
-# N, mean, and SD of low-NCP
-l.eff <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !is.na(PCET_CAT)),
-                                                           mean = mean(PCET_EFF, na.rm = T),
-                                                           sd = sd(PCET_EFF, na.rm = T)) 
+# N, mean, and SD of high-NCP vs. low-NCP
+eff_n <- pcet %>% dplyr::group_by(Group) %>% summarise(count=sum(!is.na(PCET_EFF)))
+eff <- pcet %>% dplyr::group_by(Group) %>% summarise(mean=mean(PCET_EFF, na.rm=T), sd=sd(PCET_EFF, na.rm=T))
+
 # Efficiency Raincloud Plot
 pcet %>% 
   ggplot(aes(x = Group, y = PCET_EFF, fill = Group)) + 
@@ -488,19 +526,14 @@ pcet %>%
 
 ``` r
 # Significance Test of Efficiency by Group 
-#var.test(high$PCET_EFF, low$PCET_EFF) #Fisher's F-test, p>0.05; homogeneous sample
-eff.t <- t.test(high$PCET_EFF, low$PCET_EFF, var.equal = TRUE) 
-eff.d <- cohen.d(high$PCET_EFF, low$PCET_EFF, na.rm = T)
+#var.test(pcet$PCET_EFF~pcet$Group) #Fisher's F-test, p>0.05; homogeneous sample
+eff.t <- t.test(pcet$PCET_EFF~pcet$Group, var.equal=T) 
+eff.d <- cohen.d(pcet$PCET_EFF~pcet$Group, na.rm=T)
 
 # 4. Perseveration Error Rate (PER_ER)
-# N, mean, and SD of high-NCP
-h.err <- pcet %>% filter(Group == "High") %>% summarise(n = sum(Group=="High" & !is.na(PCET_CAT)),
-                                                            mean = mean(PER_ER, na.rm = T),
-                                                            sd = sd(PER_ER, na.rm = T))
-# N, mean, and SD of low-NCP
-l.err <- pcet %>% filter(Group == "Low") %>% summarise(n = sum(Group=="Low" & !is.na(PCET_CAT)),
-                                                           mean = mean(PER_ER, na.rm = T),
-                                                           sd = sd(PER_ER, na.rm = T)) 
+# N, mean, and SD of high-NCP vs. low-NCP
+err_n <- pcet %>% dplyr::group_by(Group) %>% summarise(count=sum(!is.na(PER_ER)))
+err <- pcet %>% dplyr::group_by(Group) %>% summarise(mean=mean(PER_ER, na.rm=T), sd=sd(PER_ER, na.rm=T))
 
 # Perseveration Raincloud Plot
 pcet %>% 
@@ -525,24 +558,24 @@ pcet %>%
 
 ``` r
 # Significance Test of Perseveration Error by Group
-#var.test(as.numeric(score.high$value), as.numeric(score.low$value)) #homogeneous
-error.t <- t.test(high$PER_ER, low$PER_ER, var.equal=T) #p=0.014
-error.d <- cohen.d(high$PER_ER, low$PER_ER, na.rm = T)
+#var.test(pcet$PER_ER~pcet$Group) #Fisher's F-test, p<0.05; heterogeneous sample
+err.t <- t.test(pcet$PER_ER~pcet$Group, var.equal=F) # t-test rather than ANOVA because I'm comparing two samples (high vs. low)
+err.d <- cohen.d(pcet$PER_ER~pcet$Group, na.rm=T)
 
 # Summary Table
-h.cat = paste(round(h.cat['mean'], 2), "(", round(h.cat['sd'], 2), ")", sep = "")
-l.cat = paste(round(l.cat['mean'], 2), "(", round(l.cat['sd'], 2), ")", sep = "")
-h.acc.sum = paste(round(h.acc['mean'], 2), "(" , round(h.acc['sd'], 2), ")", sep = "")
-h.eff.sum = paste(round(h.eff['mean'], 2), "(" , round(h.eff['sd'], 2), ")", sep = "")
-h.err.sum = paste(round(h.err['mean'], 2), "(" , round(h.err['sd'], 2), ")", sep = "")
-l.acc.sum = paste(round(l.acc['mean'], 2), "(" , round(l.acc['sd'], 2), ")", sep = "")
-l.eff.sum = paste(round(l.eff['mean'], 2), "(" , round(l.eff['sd'], 2), ")", sep = "")
-l.err.sum = paste(round(l.err['mean'], 2), "(" , round(l.err['sd'], 2), ")", sep = "")
+h.cat = paste(round(cat[2,2], 2), "(", round(cat[2,3], 2), ")", sep = "")
+l.cat = paste(round(cat[1,2], 2), "(", round(cat[1,3], 2), ")", sep = "")
+h.acc.sum = paste(round(acc[2,2], 2), "(" , round(acc[2,3], 2), ")", sep = "")
+h.eff.sum = paste(round(eff[2,2], 2), "(" , round(eff[2,3], 2), ")", sep = "")
+h.err.sum = paste(round(err[2,2], 2), "(" , round(err[2,3], 2), ")", sep = "")
+l.acc.sum = paste(round(acc[1,2], 2), "(" , round(acc[1,3], 2), ")", sep = "")
+l.eff.sum = paste(round(eff[1,2], 2), "(" , round(eff[1,3], 2), ")", sep = "")
+l.err.sum = paste(round(err[1,2], 2), "(" , round(err[1,3], 2), ")", sep = "")
 
 high.summary <- cbind(h.cat, h.acc.sum, h.eff.sum, h.err.sum)
-pval <- round(cbind(cat.t[["p.value"]], acc.t[["p.value"]], eff.t[["p.value"]], error.t[["p.value"]]),3)
+pval <- round(cbind(cat.t[["p.value"]], acc.t[["p.value"]], eff.t[["p.value"]], err.t[["p.value"]]),3)
 low.summary <- cbind(l.cat, l.acc.sum, l.eff.sum, l.err.sum)
-cohensd <- abs(round(cbind(cat.d[["estimate"]], acc.d[["estimate"]], eff.d[["estimate"]], error.d[["estimate"]]), 3))
+cohensd <- abs(round(cbind(cat.d[["estimate"]], acc.d[["estimate"]], eff.d[["estimate"]], err.d[["estimate"]]), 3))
 performance.table <- data.frame(rbind(high.summary, low.summary, pval, cohensd))
 colnames(performance.table) <- c("CAT", "Accuracy", "Efficiency", "Perseveration")
 rownames(performance.table) <- c("High NCP", "Low NCP", "p-value", "Cohen's D")
@@ -622,7 +655,7 @@ p-value
 0.012
 </td>
 <td style="text-align:left;">
-0.005
+0.009
 </td>
 </tr>
 <tr>
